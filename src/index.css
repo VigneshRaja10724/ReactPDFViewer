@@ -11,3 +11,14 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: solid 1px #ccc;
+}
+
+.active {
+  background-color: #1348b4;
+}
