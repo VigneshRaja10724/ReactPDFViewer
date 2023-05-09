@@ -7,11 +7,12 @@ import {
   ThumbnailIcon,
 } from "@react-pdf-viewer/default-layout";
 import type { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import {PageContext} from "./../App"
 
-export const SelectThumbnail = (pageSelected:any) => {
-  const [page, setPage] = useState<any>();
-  const [selectedPages, setSelectedPages] = useState<any[]>([]);
+
+export const SelectThumbnail = () => {
+  const {selectedPages, setSelectedPages} : any  = useContext(PageContext);
   const [color, setColor] = useState<string>();
 
   const handleChoosePage = (e: any, props: any) => {
@@ -20,40 +21,20 @@ export const SelectThumbnail = (pageSelected:any) => {
         const copy = [...selectedPages];
         copy[props.pageIndex] = props.pageIndex;
         setSelectedPages(copy);
-        // console.log(copy, "selectedPages")
+        console.log(copy, "selectedPages")
         setColor("rgba(0, 0, 0, 0.3)");
-        pageSelected.selectedArray (copy);
+        setSelectedPages(copy);
       }
       
       if (selectedPages[props.pageIndex] === props.pageIndex) {
         const copy = [...selectedPages];
         copy[props.pageIndex] = undefined;
         setSelectedPages(copy);
-        pageSelected.selectedArray (copy);
-        // props.selectArray(copy)
+        setSelectedPages (copy);
       }
     }
     
-    // props.selectArray(selectedPages);
-
-    if (e.shiftKey) {
-      if (selectedPages[props.pageIndex] === undefined) {
-        const copy = [...selectedPages];
-        copy[props.pageIndex] = props.pageIndex;
-        if (selectedPages.length === 0) {
-          setPage(props.pageIndex);
-        }
-        setSelectedPages(copy);
-        console.log(selectedPages);
-
-        const max = selectedPages.slice(-1)[0];
-        const min = page;
-        console.log(min, "min");
-        const selectArray = copy.slice(min, max + 1);
-        console.log(selectArray);
-        setColor("rgba(0, 0, 0, 0.3)");
-      }
-    }
+   
   };
 
   const renderThumbnailItem = (props: RenderThumbnailItemProps) => (

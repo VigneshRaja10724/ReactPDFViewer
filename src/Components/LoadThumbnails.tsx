@@ -1,15 +1,14 @@
-interface SelectedPages {
-    pages: any[];
-  }
+import { useContext } from "react";
+import {PageContext} from "./../App"
 
-export const LoadSelectedThumbnails = (selectedPages : SelectedPages) =>{
-    
+export const LoadSelectedThumbnails = () =>{
+    const {selectedPages} : any  = useContext(PageContext);
     return(
         <p>
              Selected pages:{' '}
-         {selectedPages.pages
-            .map((v, idx) => 
-                ( v + 1 )
+         {selectedPages
+            .map((value : number, index: number) => 
+                ( value + 1 )
             )
             .filter(Number)
             .join(',')
