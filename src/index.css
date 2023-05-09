@@ -19,6 +19,11 @@ code {
   border: solid 1px #ccc;
 }
 
+.scroll {
+  overflow-y: auto;
+  height: 650px;
+}
+
 .active {
   background-color: #1348b4;
 }
