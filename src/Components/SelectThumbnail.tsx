@@ -8,8 +8,12 @@ import {
 } from "@react-pdf-viewer/default-layout";
 import type { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { SelectedPages } from "../Redux/actions/SelectedPageAction";
 
-export const SelectThumbnail = (pageSelected:any) => {
+export const SelectThumbnail = () => {
+  const dispatch = useDispatch();
+ 
   const [page, setPage] = useState<any>();
   const [selectedPages, setSelectedPages] = useState<any[]>([]);
   const [color, setColor] = useState<string>();
@@ -20,38 +24,15 @@ export const SelectThumbnail = (pageSelected:any) => {
         const copy = [...selectedPages];
         copy[props.pageIndex] = props.pageIndex;
         setSelectedPages(copy);
-        // console.log(copy, "selectedPages")
         setColor("rgba(0, 0, 0, 0.3)");
-        pageSelected.selectedArray (copy);
+        dispatch(SelectedPages(copy));
       }
-      
+
       if (selectedPages[props.pageIndex] === props.pageIndex) {
         const copy = [...selectedPages];
         copy[props.pageIndex] = undefined;
         setSelectedPages(copy);
-        pageSelected.selectedArray (copy);
-        // props.selectArray(copy)
-      }
-    }
-    
-    // props.selectArray(selectedPages);
-
-    if (e.shiftKey) {
-      if (selectedPages[props.pageIndex] === undefined) {
-        const copy = [...selectedPages];
-        copy[props.pageIndex] = props.pageIndex;
-        if (selectedPages.length === 0) {
-          setPage(props.pageIndex);
-        }
-        setSelectedPages(copy);
-        console.log(selectedPages);
-
-        const max = selectedPages.slice(-1)[0];
-        const min = page;
-        console.log(min, "min");
-        const selectArray = copy.slice(min, max + 1);
-        console.log(selectArray);
-        setColor("rgba(0, 0, 0, 0.3)");
+        dispatch(SelectedPages(copy));  
       }
     }
   };
