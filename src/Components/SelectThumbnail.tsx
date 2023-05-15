@@ -9,7 +9,7 @@ import {
 import type { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { SelectedPages } from "../Redux/actions/SelectedPageAction";
+import { pageSelected } from "../Strore/SelecetedPageSclice";
 
 export const SelectThumbnail = () => {
   const dispatch = useDispatch();
@@ -25,14 +25,14 @@ export const SelectThumbnail = () => {
         copy[props.pageIndex] = props.pageIndex;
         setSelectedPages(copy);
         setColor("rgba(0, 0, 0, 0.3)");
-        dispatch(SelectedPages(copy));
+        dispatch(pageSelected(copy));
       }
 
       if (selectedPages[props.pageIndex] === props.pageIndex) {
         const copy = [...selectedPages];
         copy[props.pageIndex] = undefined;
         setSelectedPages(copy);
-        dispatch(SelectedPages(copy));  
+        dispatch(pageSelected(copy));  
       }
     }
   };

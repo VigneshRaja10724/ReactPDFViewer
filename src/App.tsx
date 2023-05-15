@@ -6,7 +6,7 @@ import { Worker } from "@react-pdf-viewer/core";
 import { SelectThumbnail } from "./Components/SelectThumbnail";
 import { Container, Row, Col } from "react-bootstrap";
 import { LoadSelectedThumbnails } from "./Components/LoadThumbnails";
-import { store } from "./Redux/store/store";
+import { store } from "./Strore/store";
 import { Provider } from "react-redux";
 
 function App() {
