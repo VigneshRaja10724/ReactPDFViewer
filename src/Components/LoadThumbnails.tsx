@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 export const LoadSelectedThumbnails = () =>{
-    const pages   = useSelector((state : any) => state.pages);
+    const pages   = useSelector((state : any) => state.selectPage.pages);
     useEffect(()=>{
         console.log(pages)
     },[pages])
