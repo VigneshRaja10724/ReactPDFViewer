@@ -1,24 +1,33 @@
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
-import { Viewer } from "@react-pdf-viewer/core";
+import { MinimalButton, RotateDirection, Viewer } from "@react-pdf-viewer/core";
 import {
-  defaultLayoutPlugin,
   ThumbnailIcon,
+  ToolbarProps,
+  ToolbarSlot,
+  defaultLayoutPlugin,
 } from "@react-pdf-viewer/default-layout";
+import { RotateBackwardIcon, RotateForwardIcon } from "@react-pdf-viewer/rotate";
 import type { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import { useDispatch } from "react-redux";
 import { pageSelected } from "../Strore/SelecetedPageSclice";
 
 export const SelectThumbnail = () => {
   const dispatch = useDispatch();
- 
+
   const [page, setPage] = useState<any>();
   const [selectedPages, setSelectedPages] = useState<any[]>([]);
   const [color, setColor] = useState<string>();
 
   const handleChoosePage = (e: any, props: any) => {
+    console.log(props)
+    console.log("initial",props.renderPageThumbnail.props.pageRotation)
+    // console.log(props.numPages)
+    // console.log(props.onRotatePage.length)
+    // console.log(props.onRotatePage.Scopes[1].pagesRotation)
+
     if (e.ctrlKey) {
       if (selectedPages[props.pageIndex] === undefined) {
         const copy = [...selectedPages];
@@ -32,7 +41,7 @@ export const SelectThumbnail = () => {
         const copy = [...selectedPages];
         copy[props.pageIndex] = undefined;
         setSelectedPages(copy);
-        dispatch(pageSelected(copy));  
+        dispatch(pageSelected(copy));
       }
     }
   };
@@ -68,6 +77,57 @@ export const SelectThumbnail = () => {
     </div>
   );
 
+  const rotateForward = (props: any) => {
+    console.log(props);
+    const selectedPageNumbers = selectedPages.filter(Number.isFinite)
+    selectedPageNumbers
+      .map((pages) => {
+        props.onRotatePage(pages, RotateDirection.Forward);
+      });
+  };
+  const rotateBackward = (props: any) => {
+    console.log(props);
+    const selectedPageNumbers = selectedPages.filter(Number.isFinite)
+    selectedPageNumbers
+      .map((pages) => {
+        props.onRotatePage(pages, RotateDirection.Backward);
+      });
+  };
+  const renderToolbar = (Toolbar: (props: ToolbarProps) => ReactElement) => (
+    <Toolbar>
+      {(slots: ToolbarSlot) => {
+        return (
+          <div
+            style={{
+              alignItems: "center",
+              display: "flex",
+            }}
+          >
+            <div style={{ padding: "0px 200px" }}>
+              <RotatePage>
+                {(props) => (
+                  <MinimalButton onClick={() => rotateForward(props)}>
+                    <RotateForwardIcon />
+                  </MinimalButton>
+                )}
+              </RotatePage>{" "}
+                
+              <RotatePage>
+                {(props) => (
+                  <MinimalButton
+                    onClick={() => rotateBackward(props)}
+                  >
+                    <RotateBackwardIcon />
+                  </MinimalButton>
+                )}
+              </RotatePage>
+            </div>
+          </div>
+        );
+      }}
+    </Toolbar>
+  );
+
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
     sidebarTabs: (defaultTabs) =>
       [
@@ -77,7 +137,13 @@ export const SelectThumbnail = () => {
           title: "Thumbnails",
         },
       ].concat(defaultTabs.slice(1)),
+    renderToolbar,
   });
+
+  const rotatePluginInstance =
+    defaultLayoutPluginInstance.toolbarPluginInstance.rotatePluginInstance;
+  const { RotatePage } =
+    rotatePluginInstance;
 
   const thumbnailPluginInstance =
     defaultLayoutPluginInstance.thumbnailPluginInstance;
