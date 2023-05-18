@@ -8,9 +8,12 @@ import {
   ToolbarSlot,
   defaultLayoutPlugin,
 } from "@react-pdf-viewer/default-layout";
-import { RotateBackwardIcon, RotateForwardIcon } from "@react-pdf-viewer/rotate";
+import {
+  RotateBackwardIcon,
+  RotateForwardIcon,
+} from "@react-pdf-viewer/rotate";
 import type { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { pageSelected } from "../Strore/SelecetedPageSclice";
 
@@ -20,10 +23,18 @@ export const SelectThumbnail = () => {
   const [page, setPage] = useState<any>();
   const [selectedPages, setSelectedPages] = useState<any[]>([]);
   const [color, setColor] = useState<string>();
+  const [thumbnailAngle, setThumbnailAngle] = useState<any>();
+
+  useEffect(() =>{
+    console.log(thumbnailAngle)
+  },[thumbnailAngle]);
+
 
   const handleChoosePage = (e: any, props: any) => {
-    console.log(props)
-    console.log("initial",props.renderPageThumbnail.props.pageRotation)
+    console.log(props);
+    console.log(props.numPages);
+    console.log("initial", props.renderPageThumbnail.props.pageRotation);
+    setThumbnailAngle(props.renderPageThumbnail.props.pageRotation);
     // console.log(props.numPages)
     // console.log(props.onRotatePage.length)
     // console.log(props.onRotatePage.Scopes[1].pagesRotation)
@@ -79,31 +90,70 @@ export const SelectThumbnail = () => {
 
   const rotateForward = (props: any) => {
     console.log(props);
-    const selectedPageNumbers = selectedPages.filter(Number.isFinite)
-    selectedPageNumbers
-      .map((pages) => {
-        props.onRotatePage(pages, RotateDirection.Forward);
-      });
+    const selectedPageNumbers = selectedPages.filter(Number.isFinite);
+    selectedPageNumbers.map((pages) => {
+      props.onRotatePage(pages, RotateDirection.Forward);
+    });
+    // setColor("#fff")
   };
   const rotateBackward = (props: any) => {
     console.log(props);
-    const selectedPageNumbers = selectedPages.filter(Number.isFinite)
-    selectedPageNumbers
-      .map((pages) => {
-        props.onRotatePage(pages, RotateDirection.Backward);
-      });
+    const selectedPageNumbers = selectedPages.filter(Number.isFinite);
+    selectedPageNumbers.map((pages) => {
+      props.onRotatePage(pages, RotateDirection.Backward);
+    });
   };
   const renderToolbar = (Toolbar: (props: ToolbarProps) => ReactElement) => (
     <Toolbar>
       {(slots: ToolbarSlot) => {
+        const {
+          CurrentPageInput,
+          Download,
+          GoToNextPage,
+          GoToPreviousPage,
+          NumberOfPages,
+          Zoom,
+          ZoomIn,
+          ZoomOut,
+          Open
+        } = slots;
         return (
           <div
             style={{
               alignItems: "center",
               display: "flex",
+              width: "100%",
             }}
           >
-            <div style={{ padding: "0px 200px" }}>
+  
+            <div style={{ padding: "0px 2px" }}>
+              <ZoomOut />
+            </div>
+            <div style={{ padding: "0px 2px" }}>
+              <Zoom />
+            </div>
+            <div style={{ padding: "0px 2px" }}>
+              <ZoomIn />
+            </div>
+            <div style={{ padding: "0px 2px", marginLeft: "auto" }}>
+              <GoToPreviousPage />
+            </div>
+            <div style={{ padding: "0px 2px", width: "4rem" }}>
+              <CurrentPageInput />
+            </div>
+            <div style={{ padding: "0px 2px" }}>
+              / <NumberOfPages />
+            </div>
+            <div style={{ padding: "0px 2px" }}>
+              <GoToNextPage />
+            </div>
+            <div style={{ padding: "0px 2px", marginLeft: "auto" }}>
+              <Download />
+            </div>
+            <div style={{ padding: "0px 2px" }}>
+              <Open />
+            </div>
+            <div style={{ padding: "0px 2px" }}>
               <RotatePage>
                 {(props) => (
                   <MinimalButton onClick={() => rotateForward(props)}>
@@ -111,12 +161,9 @@ export const SelectThumbnail = () => {
                   </MinimalButton>
                 )}
               </RotatePage>{" "}
-                
               <RotatePage>
                 {(props) => (
-                  <MinimalButton
-                    onClick={() => rotateBackward(props)}
-                  >
+                  <MinimalButton onClick={() => rotateBackward(props)}>
                     <RotateBackwardIcon />
                   </MinimalButton>
                 )}
@@ -142,8 +189,7 @@ export const SelectThumbnail = () => {
 
   const rotatePluginInstance =
     defaultLayoutPluginInstance.toolbarPluginInstance.rotatePluginInstance;
-  const { RotatePage } =
-    rotatePluginInstance;
+  const { RotatePage } = rotatePluginInstance;
 
   const thumbnailPluginInstance =
     defaultLayoutPluginInstance.thumbnailPluginInstance;
