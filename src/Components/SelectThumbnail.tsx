@@ -1,7 +1,12 @@
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
-import { MinimalButton, RotateDirection, Viewer } from "@react-pdf-viewer/core";
+import {
+  DocumentLoadEvent,
+  MinimalButton,
+  RotateDirection,
+  Viewer,
+} from "@react-pdf-viewer/core";
 import {
   ThumbnailIcon,
   ToolbarProps,
@@ -13,31 +18,20 @@ import {
   RotateForwardIcon,
 } from "@react-pdf-viewer/rotate";
 import type { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import { useDispatch } from "react-redux";
-import { pageSelected } from "../Strore/SelecetedPageSclice";
+import {
+  pageSelected,
+  totalPages,
+} from "../Strore/SelecetedPageSclice";
 
 export const SelectThumbnail = () => {
   const dispatch = useDispatch();
 
-  const [page, setPage] = useState<any>();
-  const [selectedPages, setSelectedPages] = useState<any[]>([]);
-  const [color, setColor] = useState<string>();
-  const [thumbnailAngle, setThumbnailAngle] = useState<any>();
-
-  useEffect(() =>{
-    console.log(thumbnailAngle)
-  },[thumbnailAngle]);
-
+  const [selectedPages, setSelectedPages] = useState<any[]>([0]);
+  const [color, setColor] = useState<string>("rgba(0, 0, 0, 0.3)");
 
   const handleChoosePage = (e: any, props: any) => {
-    console.log(props);
-    console.log(props.numPages);
-    console.log("initial", props.renderPageThumbnail.props.pageRotation);
-    setThumbnailAngle(props.renderPageThumbnail.props.pageRotation);
-    // console.log(props.numPages)
-    // console.log(props.onRotatePage.length)
-    // console.log(props.onRotatePage.Scopes[1].pagesRotation)
 
     if (e.ctrlKey) {
       if (selectedPages[props.pageIndex] === undefined) {
@@ -65,7 +59,7 @@ export const SelectThumbnail = () => {
       data-testid={`thumbnail-${props.pageIndex}`}
       style={{
         backgroundColor:
-          props.pageIndex === selectedPages[props.pageIndex] ? color : "#fff",
+          props.pageIndex === selectedPages[props.pageIndex]  ? color : "#fff",
         cursor: "pointer",
         padding: "0.5rem",
         width: "100%",
@@ -103,77 +97,80 @@ export const SelectThumbnail = () => {
       props.onRotatePage(pages, RotateDirection.Backward);
     });
   };
-  const renderToolbar = (Toolbar: (props: ToolbarProps) => ReactElement) => (
-    <Toolbar>
-      {(slots: ToolbarSlot) => {
-        const {
-          CurrentPageInput,
-          Download,
-          GoToNextPage,
-          GoToPreviousPage,
-          NumberOfPages,
-          Zoom,
-          ZoomIn,
-          ZoomOut,
-          Open
-        } = slots;
-        return (
-          <div
-            style={{
-              alignItems: "center",
-              display: "flex",
-              width: "100%",
-            }}
-          >
-  
-            <div style={{ padding: "0px 2px" }}>
-              <ZoomOut />
-            </div>
-            <div style={{ padding: "0px 2px" }}>
-              <Zoom />
-            </div>
-            <div style={{ padding: "0px 2px" }}>
-              <ZoomIn />
-            </div>
-            <div style={{ padding: "0px 2px", marginLeft: "auto" }}>
-              <GoToPreviousPage />
-            </div>
-            <div style={{ padding: "0px 2px", width: "4rem" }}>
-              <CurrentPageInput />
-            </div>
-            <div style={{ padding: "0px 2px" }}>
-              / <NumberOfPages />
-            </div>
-            <div style={{ padding: "0px 2px" }}>
-              <GoToNextPage />
-            </div>
-            <div style={{ padding: "0px 2px", marginLeft: "auto" }}>
-              <Download />
-            </div>
-            <div style={{ padding: "0px 2px" }}>
-              <Open />
-            </div>
-            <div style={{ padding: "0px 2px" }}>
-              <RotatePage>
-                {(props) => (
-                  <MinimalButton onClick={() => rotateForward(props)}>
-                    <RotateForwardIcon />
-                  </MinimalButton>
-                )}
-              </RotatePage>{" "}
-              <RotatePage>
-                {(props) => (
-                  <MinimalButton onClick={() => rotateBackward(props)}>
-                    <RotateBackwardIcon />
-                  </MinimalButton>
-                )}
-              </RotatePage>
-            </div>
-          </div>
-        );
-      }}
-    </Toolbar>
-  );
+  const renderToolbar = (Toolbar: (props: ToolbarProps) => ReactElement) => {
+    return (
+      <>
+        <Toolbar>
+          {(slots: ToolbarSlot) => {
+            const {
+              CurrentPageInput,
+              Download,
+              GoToNextPage,
+              GoToPreviousPage,
+              NumberOfPages,
+              Zoom,
+              ZoomIn,
+              ZoomOut,
+              Open,
+            } = slots;
+            return (
+              <div
+                style={{
+                  alignItems: "center",
+                  display: "flex",
+                  width: "100%",
+                }}
+              >
+                <div style={{ padding: "0px 2px" }}>
+                  <ZoomOut />
+                </div>
+                <div style={{ padding: "0px 2px" }}>
+                  <Zoom />
+                </div>
+                <div style={{ padding: "0px 2px" }}>
+                  <ZoomIn />
+                </div>
+                <div style={{ padding: "0px 2px", marginLeft: "auto" }}>
+                  <GoToPreviousPage />
+                </div>
+                <div style={{ padding: "0px 2px", width: "4rem" }}>
+                  <CurrentPageInput />
+                </div>
+                <div style={{ padding: "0px 2px" }}>
+                  / <NumberOfPages />
+                </div>
+                <div style={{ padding: "0px 2px" }}>
+                  <GoToNextPage />
+                </div>
+                <div style={{ padding: "0px 2px", marginLeft: "auto" }}>
+                  <Download />
+                </div>
+                <div style={{ padding: "0px 2px" }}>
+                  <Open />
+                </div>
+                <div style={{ padding: "0px 2px" }}>
+                  <RotatePage>
+                    {(props) => (
+                      <MinimalButton onClick={() => rotateForward(props)}>
+                        <RotateForwardIcon />
+                      </MinimalButton>
+                    )}
+                  </RotatePage>{" "}
+                  <RotatePage>
+                    {(props) => (
+                      <MinimalButton onClick={() => rotateBackward(props)}>
+                        <RotateBackwardIcon />
+                      </MinimalButton>
+                    )}
+                  </RotatePage>
+                </div>
+              </div>
+            );
+          }}
+        </Toolbar>
+      </>
+    );
+  };
 
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
     sidebarTabs: (defaultTabs) =>
@@ -195,10 +192,16 @@ export const SelectThumbnail = () => {
     defaultLayoutPluginInstance.thumbnailPluginInstance;
   const { Thumbnails } = thumbnailPluginInstance;
 
+  const handleDocumentLoad = (e: DocumentLoadEvent) => {
+    const pages = ` ${e.doc.numPages}`;
+    dispatch(totalPages(pages));
+  };
+
   return (
     <div style={{ height: "900px" }}>
       <Viewer
         fileUrl="assets/sample.pdf"
+        onDocumentLoad={handleDocumentLoad}
         plugins={[defaultLayoutPluginInstance]}
       />
     </div>

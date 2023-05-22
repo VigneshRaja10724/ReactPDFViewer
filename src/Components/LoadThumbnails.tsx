@@ -1,21 +1,22 @@
-import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../Strore/store";
-export const LoadSelectedThumbnails = () =>{
-    const pages   = useSelector((state : RootState) => state.selectPage.pagesSelected);
-    useEffect(()=>{
-        console.log(pages)
-    },[pages])
-    return(
-        <p>
-             Selected pages:{' '}{}
-         {pages
-            .map((v : any) => 
-            (v+1)
-            )
-            .filter(Number)
-            .join(',')
-            }
-        </p>
-    );
-}
+import { useEffect } from "react";
+export const LoadSelectedThumbnails = () => {
+  const pdf = useSelector((state: RootState) => state.selectPage);
+  const pages = pdf.pagesSelected;
+  const numPages = pdf.NumberOfPages;
+  useEffect(() => {
+    console.log(pdf);
+  }, []);
+  return (
+    <p>
+      No.of.Pages : {numPages}
+      {" , "}
+      Selected pages: {}
+      {pages
+        .map((v: any) => v + 1)
+        .filter(Number)
+        .join(",")}     
+    </p>
+  );
+};
