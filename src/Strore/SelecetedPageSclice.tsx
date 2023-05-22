@@ -4,11 +4,13 @@ export interface pdf{
     NumberOfPages : number,
     angle : number,
     pagesSelected : string[],
+    deletedPages : string[]
 }
 const initialState : pdf ={
     NumberOfPages : 0,
     angle : 0,
     pagesSelected : [],
+    deletedPages : []
 }
 
 export const SelectedPages = createSlice({ // instead of having action and reducer in seperate, we can combine it in slice 
@@ -20,8 +22,11 @@ export const SelectedPages = createSlice({ // instead of having action and reduc
         },
         totalPages : (state, action) =>{
             state.NumberOfPages = action.payload;
+        },
+        deletedPages : (state, action) =>{
+            state.deletedPages = action.payload;
         }
     } 
 });
 
-export const {pageSelected, totalPages} = SelectedPages.actions;
+export const {pageSelected, totalPages, deletedPages} = SelectedPages.actions;

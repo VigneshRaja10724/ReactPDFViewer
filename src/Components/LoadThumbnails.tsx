@@ -5,9 +5,8 @@ export const LoadSelectedThumbnails = () => {
   const pdf = useSelector((state: RootState) => state.selectPage);
   const pages = pdf.pagesSelected;
   const numPages = pdf.NumberOfPages;
-  useEffect(() => {
-    console.log(pdf);
-  }, []);
+  const deletedPages = pdf.deletedPages;
+
   return (
     <p>
       No.of.Pages : {numPages}
@@ -16,7 +15,13 @@ export const LoadSelectedThumbnails = () => {
       {pages
         .map((v: any) => v + 1)
         .filter(Number)
-        .join(",")}     
+        .join(",")}
+      {" , "}
+      DeletedPages :{" "}
+      {deletedPages
+        .map((v: any) => v + 1)
+        .filter(Number)
+        .join(",")}
     </p>
   );
 };

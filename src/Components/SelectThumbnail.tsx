@@ -4,6 +4,7 @@ import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import {
   DocumentLoadEvent,
   MinimalButton,
+  PageLayout,
   RotateDirection,
   Viewer,
 } from "@react-pdf-viewer/core";
@@ -18,20 +19,35 @@ import {
   RotateForwardIcon,
 } from "@react-pdf-viewer/rotate";
 import type { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import {
+  deletedPages,
   pageSelected,
   totalPages,
 } from "../Strore/SelecetedPageSclice";
+import { Button, CloseButton, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 export const SelectThumbnail = () => {
   const dispatch = useDispatch();
 
   const [selectedPages, setSelectedPages] = useState<any[]>([0]);
   const [color, setColor] = useState<string>("rgba(0, 0, 0, 0.3)");
+  // const [thumbnailAngle, setThumbnailAngle] = useState<any>();
+
+  useEffect(() => {
+    dispatch(pageSelected(selectedPages));
+  }, []);
 
   const handleChoosePage = (e: any, props: any) => {
+    console.log(props);
+    console.log(props.currentPage);
+    // console.log(props.numPages);
+    // console.log("initial", props.renderPageThumbnail.props.pageRotation);
+    // setThumbnailAngle(props.renderPageThumbnail.props.pageRotation);
+    // console.log(props.numPages)
+    // console.log(props.onRotatePage.length)
+    // console.log(props.onRotatePage.Scopes[1].pagesRotation)
 
     if (e.ctrlKey) {
       if (selectedPages[props.pageIndex] === undefined) {
@@ -60,6 +76,7 @@ export const SelectThumbnail = () => {
       style={{
         backgroundColor:
           props.pageIndex === selectedPages[props.pageIndex]  ? color : "#fff",
+          // props.pageIndex === props.currentPage ? 'rgba(0, 0, 0, 0.3)' : '#fff',
         cursor: "pointer",
         padding: "0.5rem",
         width: "100%",
@@ -168,10 +185,20 @@ export const SelectThumbnail = () => {
             );
           }}
         </Toolbar>
+        <OverlayTrigger
+          placement="bottom"
+          delay={{ show: 250, hide: 400 }}
+          overlay={<Tooltip id="button-tooltip-2">Delete</Tooltip>}
+        >
+          <CloseButton onClick={deletePages} />
+        </OverlayTrigger>
       </>
     );
   };
-
+  const deletePages = () => {
+    console.log("deletePages");
+    dispatch(deletedPages(selectedPages));
+  };
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
     sidebarTabs: (defaultTabs) =>
       [
@@ -192,6 +219,16 @@ export const SelectThumbnail = () => {
     defaultLayoutPluginInstance.thumbnailPluginInstance;
   const { Thumbnails } = thumbnailPluginInstance;
 
+  //   const pageLayout: PageLayout = {
+  //     buildPageStyles: ({numPages}) => ({
+  //       alignItems: 'center',
+  //       display: 'flex',
+  //       justifyContent: 'center',
+
+  //   }),
+  //     transformSize: ({  numPages: number, pageIndex, size }) => ({ height: size.height - 70, width: size.width - 70 })
+
+  // };
   const handleDocumentLoad = (e: DocumentLoadEvent) => {
     const pages = ` ${e.doc.numPages}`;
     dispatch(totalPages(pages));
@@ -201,6 +238,7 @@ export const SelectThumbnail = () => {
     <div style={{ height: "900px" }}>
       <Viewer
         fileUrl="assets/sample.pdf"
+        // pageLayout={pageLayout}
         onDocumentLoad={handleDocumentLoad}
         plugins={[defaultLayoutPluginInstance]}
       />
