@@ -41,9 +41,9 @@ export const SelectThumbnail = () => {
 
   const handleChoosePage = (e: any, props: any) => {
     console.log(props);
-    console.log(props.currentPage);
+    // console.log(props.currentPage);
     // console.log(props.numPages);
-    // console.log("initial", props.renderPageThumbnail.props.pageRotation);
+    console.log("initial", props.renderPageThumbnail.props.pageRotation);
     // setThumbnailAngle(props.renderPageThumbnail.props.pageRotation);
     // console.log(props.numPages)
     // console.log(props.onRotatePage.length)
@@ -75,26 +75,28 @@ export const SelectThumbnail = () => {
       data-testid={`thumbnail-${props.pageIndex}`}
       style={{
         backgroundColor:
-          props.pageIndex === selectedPages[props.pageIndex]  ? color : "#fff",
-          // props.pageIndex === props.currentPage ? 'rgba(0, 0, 0, 0.3)' : '#fff',
+          props.pageIndex === selectedPages[props.pageIndex] ? color : "#fff",
         cursor: "pointer",
-        padding: "0.5rem",
-        width: "100%",
+        padding: "0.1rem",
+        width: "9rem",
       }}
     >
-      <div style={{ marginBottom: "0.5rem" }} onClick={props.onJumpToPage}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+        }}
+        onClick={props.onJumpToPage}
+      >
         {props.renderPageThumbnail}
       </div>
       <div
         style={{
-          alignItems: "center",
           display: "flex",
           justifyContent: "center",
-          margin: "0 auto",
-          width: "100px",
         }}
       >
-        <div style={{ marginRight: "auto" }}>Page {props.renderPageLabel}</div>
+        {props.renderPageLabel}
       </div>
     </div>
   );
@@ -200,15 +202,14 @@ export const SelectThumbnail = () => {
     dispatch(deletedPages(selectedPages));
   };
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
-    sidebarTabs: (defaultTabs) =>
-      [
-        {
-          content: <Thumbnails renderThumbnailItem={renderThumbnailItem} />,
-          icon: <ThumbnailIcon />,
-          title: "Thumbnails",
-        },
-      ].concat(defaultTabs.slice(1)),
-    renderToolbar,
+    sidebarTabs: (defaultTabs) => [
+      {
+        content: <Thumbnails renderThumbnailItem={renderThumbnailItem} />,
+        icon: <ThumbnailIcon />,
+        title: "Thumbnails",
+      },
+    ],
+    renderToolbar: renderToolbar,
   });
 
   const rotatePluginInstance =
@@ -219,26 +220,37 @@ export const SelectThumbnail = () => {
     defaultLayoutPluginInstance.thumbnailPluginInstance;
   const { Thumbnails } = thumbnailPluginInstance;
 
-  //   const pageLayout: PageLayout = {
-  //     buildPageStyles: ({numPages}) => ({
-  //       alignItems: 'center',
-  //       display: 'flex',
-  //       justifyContent: 'center',
+  const pageLayout: PageLayout = {
+    //   buildPageStyles: ({numPages}) => ({
+    //     alignItems: 'center',
+    //     display: 'flex',
+    //     justifyContent: 'center',
 
-  //   }),
-  //     transformSize: ({  numPages: number, pageIndex, size }) => ({ height: size.height - 70, width: size.width - 70 })
-
-  // };
+    // }),
+    transformSize: ({ size }) => ({ height: 950, width: size.width }),
+  };
   const handleDocumentLoad = (e: DocumentLoadEvent) => {
+    console.log("onload", e);
+    const { activateTab } = defaultLayoutPluginInstance;
+    activateTab(0);
     const pages = ` ${e.doc.numPages}`;
     dispatch(totalPages(pages));
+  };
+
+  const getRotaion = (e: any) => {
+    console.log("afterRotation", e.rotation);
+  };
+  const handelPageChange = (e: any) => {
+    console.log("pageChange", e);
   };
 
   return (
     <div style={{ height: "900px" }}>
       <Viewer
         fileUrl="assets/sample.pdf"
-        // pageLayout={pageLayout}
+        onPageChange={handelPageChange}
+        onRotatePage={getRotaion}
+        pageLayout={pageLayout}
         onDocumentLoad={handleDocumentLoad}
         plugins={[defaultLayoutPluginInstance]}
       />
