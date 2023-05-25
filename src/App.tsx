@@ -6,6 +6,7 @@ import { Worker } from "@react-pdf-viewer/core";
 import { SelectThumbnail } from "./Components/SelectThumbnail";
 import { Container, Row, Col } from "react-bootstrap";
 import { LoadSelectedThumbnails } from "./Components/LoadThumbnails";
+import { WebSocketComponent } from "./Components/WebSocket";
 import { store } from "./Strore/store";
 import { Provider } from "react-redux";
 
@@ -24,6 +25,7 @@ function App() {
           <LoadSelectedThumbnails/>
         </Col>
       </Row>
+        <WebSocketComponent/>
     </Container>
     </Provider>
   );
