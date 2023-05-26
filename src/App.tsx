@@ -9,6 +9,7 @@ import { LoadSelectedThumbnails } from "./Components/LoadThumbnails";
 import { WebSocketComponent } from "./Components/WebSocket";
 import { store } from "./Strore/store";
 import { Provider } from "react-redux";
+import { CustomPDFViewer } from "./Components/PDFViewer";
 
 function App() {
   
@@ -16,16 +17,19 @@ function App() {
 <Provider store={store}>
     <Container fluid style={{ paddingTop: 20 }}>
       <Row xs={12}>
-          <Col xs={6} >
+          <Col xs={7} >
         <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-            <SelectThumbnail  />
+            {/* <SelectThumbnail  /> */}
+            <CustomPDFViewer />
         </Worker>
           </Col>
-        <Col xs={5}>
+        <Col xs={3}>
           <LoadSelectedThumbnails/>
         </Col>
-      </Row>
+        <Col>
         <WebSocketComponent/>
+        </Col>
+      </Row>
     </Container>
     </Provider>
   );

@@ -1,6 +1,3 @@
-import "@react-pdf-viewer/core/lib/styles/index.css";
-import "@react-pdf-viewer/default-layout/lib/styles/index.css";
-
 import {
   DocumentLoadEvent,
   MinimalButton,
@@ -230,7 +227,7 @@ export const SelectThumbnail = () => {
     transformSize: ({ size }) => ({ height: 950, width: size.width }),
   };
   const handleDocumentLoad = (e: DocumentLoadEvent) => {
-    console.log("onload", e);
+    // console.log("onload", e);
     const { activateTab } = defaultLayoutPluginInstance;
     activateTab(0);
     const pages = ` ${e.doc.numPages}`;
@@ -241,7 +238,7 @@ export const SelectThumbnail = () => {
     console.log("afterRotation", e.rotation);
   };
   const handelPageChange = (e: any) => {
-    console.log("pageChange", e);
+    // console.log("pageChange", e);
   };
 
   return (
@@ -257,3 +254,4 @@ export const SelectThumbnail = () => {
     </div>
   );
 };
+	
