@@ -62,12 +62,12 @@ useEffect(() => {
     eventData: [],
   };
   const interval = setInterval(() => {
-    console.log('Logs every sec');
+    console.log('Logs every 10 sec');
     sendJsonMessage(eventData);
   }, 10000);
 
   return () => clearInterval(interval); // clear the interval
-}, [])
+}, [readyState === 1])
 
   return (
     <>
