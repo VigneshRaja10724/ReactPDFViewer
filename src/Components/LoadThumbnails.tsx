@@ -16,7 +16,7 @@ export const LoadSelectedThumbnails = () => {
     console.log(state.websocket);
     console.log(state.websocket.connection);
     // const {lastJsonMessage} = state.websocket.connection;
-  }, []);
+  }, [connection ! == null]);
   return (
     <p>
       No.of.Pages : {numPages}
