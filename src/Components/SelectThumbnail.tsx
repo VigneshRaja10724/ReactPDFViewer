@@ -4,9 +4,8 @@ import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import {
   DocumentLoadEvent,
   MinimalButton,
-  PageLayout,
   RotateDirection,
-  Viewer,
+  Viewer
 } from "@react-pdf-viewer/core";
 import {
   ThumbnailIcon,
@@ -19,14 +18,14 @@ import {
   RotateForwardIcon,
 } from "@react-pdf-viewer/rotate";
 import type { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
+import { CloseButton, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import {
   deletedPages,
   pageSelected,
   totalPages,
 } from "../Strore/SelecetedPageSclice";
-import { Button, CloseButton, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 export const SelectThumbnail = () => {
   const dispatch = useDispatch();
@@ -35,9 +34,7 @@ export const SelectThumbnail = () => {
   const [color, setColor] = useState<string>("rgba(0, 0, 0, 0.3)");
   // const [thumbnailAngle, setThumbnailAngle] = useState<any>();
 
-  useEffect(() => {
-    dispatch(pageSelected(selectedPages));
-  }, []);
+
 
   const handleChoosePage = (e: any, props: any) => {
     console.log(props);
