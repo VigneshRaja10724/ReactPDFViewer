@@ -19,11 +19,9 @@ function App() {
 
  
 
-  // const socket = new WebSocket( "wss://trayapp.smartcorp.net:8889/?aHR0cDovL2xvY2FsaG9zdDo5MDkxLyMvZGFzaGJvYXJkL2hvbWU=");
   const  socket = useWebSocket(socketUrl);
   const { readyState, sendJsonMessage, lastMessage} = socket;
 
-  console.log(socket);
   const dispatch = useDispatch();
   useEffect(()=>{
     if(readyState === 1){
@@ -34,6 +32,7 @@ function App() {
   useEffect(() =>{
     if(lastMessage !== null){
       console.log("hit2")
+      console.log(lastMessage)
       // dispatch(setWebSocketConnection(socket))
     }
   },[lastMessage])

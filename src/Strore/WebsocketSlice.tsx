@@ -20,7 +20,7 @@ const initialState : WebSocketState = {
   readyState: 0,
   sendJsonMessage: (message: any, keep: boolean) => {},
   sendMessage: (message: any, keep: boolean) => {},
-  }
+  } 
 };
 
 export const WebsocketSlice = createSlice({
