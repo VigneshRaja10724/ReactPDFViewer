@@ -50,8 +50,6 @@ function App() {
           <LoadSelectedThumbnails/>
         </Col>
       </Row>
-      
-        {/* <WebSocketComponent/> */}
     </Container>
    
   );
