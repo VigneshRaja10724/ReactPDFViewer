@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import useWebSocket from "react-use-websocket";
 import { LoadSelectedThumbnails } from "./Components/LoadThumbnails";
 import { SelectThumbnail } from "./Components/SelectThumbnail";
-import { setWebSocketConnection } from "./Strore/WebsocketSlice";
+import { setLastJSONMessage, setWebSocketConnection } from "./Strore/WebsocketSlice";
 
 
 function App() {
@@ -33,6 +33,7 @@ function App() {
     if(lastMessage !== null){
       console.log("hit2")
       console.log(lastMessage)
+      dispatch(setLastJSONMessage(lastMessage))
       // dispatch(setWebSocketConnection(socket))
     }
   },[lastMessage])

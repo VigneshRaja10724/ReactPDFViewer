@@ -42,13 +42,14 @@ export const LoadSelectedThumbnails = () => {
 
   useEffect(() => {
     console.log(websocket.initialWebSocket)
-      setConnection(websocket.initialWebSocket);
-  }, [websocket]);
+    setConnection(websocket.initialWebSocket);
+  }, [websocket.initialWebSocket]);
+
 
   useEffect(() => {
-    if(connection !== undefined){
+    if (connection !== undefined) {
       console.log(connection);
-      const {sendJsonMessage, lastJsonMessage } = connection;
+      const { sendJsonMessage, lastJsonMessage } = connection;
       console.log(connection.readyState);
       sendJsonMessage(eventData)
     }
@@ -56,10 +57,8 @@ export const LoadSelectedThumbnails = () => {
   }, [connection])
 
   useEffect(() => {
-    // setMessage(lastJsonMessage)
-    console.log(message)
-    // console.log(connection.lastJsonMessage)
-  },[message])
+    console.log(websocket.lastMessage)
+  }, [websocket.lastMessage])
 
   return (
     <>

@@ -3,6 +3,7 @@ import { initializeConnect } from 'react-redux/es/components/connect';
 
 interface WebSocketState {
   initialWebSocket: initialWebSocket;
+  lastMessage : any
 }
 interface initialWebSocket {
   getWebSocket : (message: any, keep: boolean) => void;
@@ -20,7 +21,8 @@ const initialState : WebSocketState = {
   readyState: 0,
   sendJsonMessage: (message: any, keep: boolean) => {},
   sendMessage: (message: any, keep: boolean) => {},
-  } 
+  } ,
+  lastMessage : null
 };
 
 export const WebsocketSlice = createSlice({
@@ -28,11 +30,13 @@ export const WebsocketSlice = createSlice({
   initialState,
   reducers: {
     setWebSocketConnection: (state, action) => {
-      console.log(action.payload)
       state.initialWebSocket = action.payload;
-      
     },
+    setLastJSONMessage :(state, action) =>{
+      console.log(action.payload);
+      state.lastMessage = action.payload
+    }
   },
 });
 
-export const { setWebSocketConnection } = WebsocketSlice.actions;
+export const { setWebSocketConnection, setLastJSONMessage } = WebsocketSlice.actions;
