@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
-import { RootState } from "../Strore/store";
 import { useEffect, useState } from "react";
+import { PDFDataRangeTransport } from "pdfjs-dist";
 
 interface socket {
   readyState: number,
@@ -9,13 +9,15 @@ interface socket {
 
 export const LoadSelectedThumbnails = () => {
 
-  const [pages, setPages] = useState<any>([]);
+  const [pages, setPages] = useState<any | undefined>([]);
   const [totalPages, setTotalPages] = useState<any>([]);
   const [deletedPages, setDeletedPages] = useState<any>([]);
   const [connection, setConnection] = useState<any>();
   const [message, setMessage] = useState<any>();
-  const state = useSelector((state: RootState) => state);
-  const websocket = state.websocket;
+  const state = useSelector((state: any) => state);
+  const websocket = state.WebSocketInit;
+  const pdf = state.selectedPages;
+
 
   const trayAppConfig: any = {
     "pdf.split.size.number": "100",
@@ -34,22 +36,18 @@ export const LoadSelectedThumbnails = () => {
   };
 
   useEffect(() => {
-    const pdf = state.selectPage;
-    setPages(pdf.pagesSelected);
-    setTotalPages(pdf.NumberOfPages);
-    setDeletedPages(pdf.deletedPages);
-  }, []);
+    setPages(pdf.selectedPages);
+    setTotalPages(pdf.totalPages);
+    setDeletedPages(pdf.deletePages);
+  }, [pdf]);
 
   useEffect(() => {
-    console.log(websocket.initialWebSocket)
-      setConnection(websocket.initialWebSocket);
+      setConnection(websocket.WebSocketInit);
   }, [websocket]);
 
   useEffect(() => {
     if(connection !== undefined){
-      console.log(connection);
       const {sendJsonMessage, lastJsonMessage } = connection;
-      console.log(connection.readyState);
       sendJsonMessage(eventData)
     }
 
@@ -57,9 +55,7 @@ export const LoadSelectedThumbnails = () => {
 
   useEffect(() => {
     // setMessage(lastJsonMessage)
-    console.log(message)
-    // console.log(connection.lastJsonMessage)
-  },[message])
+   },[message])
 
   return (
     <>
@@ -68,16 +64,20 @@ export const LoadSelectedThumbnails = () => {
         No.of.Pages : {totalPages}
         {" , "}
         Selected pages: { }
-        {pages
-          .map((v: any) => v + 1)
-          .filter(Number)
-          .join(",")}
-        {" , "}
+        {pages?.map((v : number) => 
+                ( v + 1 )
+            )
+            .filter(Number)
+            .join(',')
+            } 
+           {" , "}
         DeletedPages :{" "}
-        {deletedPages
-          .map((v: any) => v + 1)
-          .filter(Number)
-          .join(",")}
+        {deletedPages?.map((v : number) => 
+                ( v + 1 )
+            )
+            .filter(Number)
+            .join(',')
+          }
       </p>
     </>
   );

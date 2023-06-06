@@ -7,8 +7,7 @@ import { useDispatch } from "react-redux";
 import useWebSocket from "react-use-websocket";
 import { LoadSelectedThumbnails } from "./Components/LoadThumbnails";
 import { SelectThumbnail } from "./Components/SelectThumbnail";
-import { setWebSocketConnection } from "./Strore/WebsocketSlice";
-
+import { webSocketInstance } from "./Redux/actions/WebSocketAction";
 
 function App() {
   // const [readyState, SetreadyState] = useState<number>();
@@ -26,14 +25,13 @@ function App() {
   useEffect(()=>{
     if(readyState === 1){
       console.log("hit")
-      dispatch(setWebSocketConnection(socket))
+      dispatch(webSocketInstance(socket))
     }
   },[readyState])
   useEffect(() =>{
     if(lastMessage !== null){
       console.log("hit2")
       console.log(lastMessage)
-      // dispatch(setWebSocketConnection(socket))
     }
   },[lastMessage])
  

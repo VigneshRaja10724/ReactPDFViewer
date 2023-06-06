@@ -21,11 +21,8 @@ import type { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
 import { ReactElement, useState } from "react";
 import { CloseButton, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import {
-  deletedPages,
-  pageSelected,
-  totalPages,
-} from "../Strore/SelecetedPageSclice";
+import { deletedPages, SelectedPages, totalPages } from "../Redux/actions/PdfActions";
+
 
 export const SelectThumbnail = () => {
   const dispatch = useDispatch();
@@ -37,14 +34,8 @@ export const SelectThumbnail = () => {
 
 
   const handleChoosePage = (e: any, props: any) => {
-    console.log(props);
-    console.log(props.currentPage);
-    // console.log(props.numPages);
-    // console.log("initial", props.renderPageThumbnail.props.pageRotation);
     // setThumbnailAngle(props.renderPageThumbnail.props.pageRotation);
-    // console.log(props.numPages)
-    // console.log(props.onRotatePage.length)
-    // console.log(props.onRotatePage.Scopes[1].pagesRotation)
+
 
     if (e.ctrlKey) {
       if (selectedPages[props.pageIndex] === undefined) {
@@ -52,14 +43,14 @@ export const SelectThumbnail = () => {
         copy[props.pageIndex] = props.pageIndex;
         setSelectedPages(copy);
         setColor("rgba(0, 0, 0, 0.3)");
-        dispatch(pageSelected(copy));
+        dispatch(SelectedPages(copy));
       }
 
       if (selectedPages[props.pageIndex] === props.pageIndex) {
         const copy = [...selectedPages];
         copy[props.pageIndex] = undefined;
         setSelectedPages(copy);
-        dispatch(pageSelected(copy));
+        dispatch(SelectedPages(copy));
       }
     }
   };
@@ -193,7 +184,6 @@ export const SelectThumbnail = () => {
     );
   };
   const deletePages = () => {
-    console.log("deletePages");
     dispatch(deletedPages(selectedPages));
   };
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
