@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { initializeConnect } from 'react-redux/es/components/connect';
 
 interface WebSocketState {
   initialWebSocket: initialWebSocket;
@@ -33,7 +32,6 @@ export const WebsocketSlice = createSlice({
       state.initialWebSocket = action.payload;
     },
     setLastJSONMessage :(state, action) =>{
-      console.log(action.payload);
       state.lastMessage = action.payload
     }
   },

@@ -1,4 +1,6 @@
 import "bootstrap/dist/css/bootstrap.css";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -12,9 +14,9 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <Provider store={store}>
-    {/* <React.StrictMode> */}
+    <React.StrictMode>
       <App />
-    {/* </React.StrictMode> */}
+    </React.StrictMode>
   </Provider>
 );
 

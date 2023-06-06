@@ -97,7 +97,6 @@ export const SelectThumbnail = () => {
   );
 
   const rotateForward = (props: any) => {
-    console.log(props);
     const selectedPageNumbers = selectedPages.filter(Number.isFinite);
     selectedPageNumbers.map((pages) => {
       props.onRotatePage(pages, RotateDirection.Forward);
@@ -105,7 +104,6 @@ export const SelectThumbnail = () => {
     // setColor("#fff")
   };
   const rotateBackward = (props: any) => {
-    console.log(props);
     const selectedPageNumbers = selectedPages.filter(Number.isFinite);
     selectedPageNumbers.map((pages) => {
       props.onRotatePage(pages, RotateDirection.Backward);
@@ -193,7 +191,6 @@ export const SelectThumbnail = () => {
     );
   };
   const deletePages = () => {
-    console.log("deletePages");
     dispatch(deletedPages(selectedPages));
   };
   const defaultLayoutPluginInstance = defaultLayoutPlugin({

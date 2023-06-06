@@ -41,16 +41,13 @@ export const LoadSelectedThumbnails = () => {
   }, [pdf]);
 
   useEffect(() => {
-    console.log(websocket.initialWebSocket)
     setConnection(websocket.initialWebSocket);
   }, [websocket.initialWebSocket]);
 
 
   useEffect(() => {
     if (connection !== undefined) {
-      console.log(connection);
       const { sendJsonMessage, lastJsonMessage } = connection;
-      console.log(connection.readyState);
       sendJsonMessage(eventData)
     }
 
