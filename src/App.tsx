@@ -24,13 +24,11 @@ function App() {
   const dispatch = useDispatch();
   useEffect(()=>{
     if(readyState === 1){
-      console.log("hit")
       dispatch(webSocketInstance(socket))
     }
   },[readyState])
   useEffect(() =>{
     if(lastMessage !== null){
-      console.log("hit2")
       console.log(lastMessage)
     }
   },[lastMessage])
