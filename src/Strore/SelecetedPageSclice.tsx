@@ -3,13 +3,13 @@ import { createSlice } from "@reduxjs/toolkit";
 export interface pdf{
     NumberOfPages : number,
     angle : number,
-    pagesSelected : string[],
+    pagesSelected : number[],
     deletedPages : string[]
 }
 const initialState : pdf ={
     NumberOfPages : 0,
     angle : 0,
-    pagesSelected : [],
+    pagesSelected : [0],
     deletedPages : []
 }
 

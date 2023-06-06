@@ -16,6 +16,7 @@ export const LoadSelectedThumbnails = () => {
   const [message, setMessage] = useState<any>();
   const state = useSelector((state: RootState) => state);
   const websocket = state.websocket;
+  const pdf = state.selectPage;
 
   const trayAppConfig: any = {
     "pdf.split.size.number": "100",
@@ -34,11 +35,10 @@ export const LoadSelectedThumbnails = () => {
   };
 
   useEffect(() => {
-    const pdf = state.selectPage;
     setPages(pdf.pagesSelected);
     setTotalPages(pdf.NumberOfPages);
     setDeletedPages(pdf.deletedPages);
-  }, []);
+  }, [pdf]);
 
   useEffect(() => {
     console.log(websocket.initialWebSocket)
