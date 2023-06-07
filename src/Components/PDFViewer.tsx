@@ -2,18 +2,19 @@ import {
   RenderThumbnailItemProps,
   thumbnailPlugin,
 } from "@react-pdf-viewer/thumbnail";
-import { MinimalButton, RotateDirection, Viewer } from "@react-pdf-viewer/core";
+import { DocumentLoadEvent, MinimalButton, RotateDirection, Viewer } from "@react-pdf-viewer/core";
 import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
 import {
   RotateBackwardIcon,
   RotateForwardIcon,
 } from "@react-pdf-viewer/rotate";
-import { CloseButton, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { deletedPages } from "../Strore/SelecetedPageSclice";
+import { CloseButton, Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
+import { deletedPages, totalPages } from "../Strore/SelecetedPageSclice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Strore/store";
 import { useState } from "react";
 import { pageSelected } from "../Strore/SelecetedPageSclice";
+import { Sidebar } from "./Sidebar";
 
 export const CustomPDFViewer = () => {
   const dispatch = useDispatch();
@@ -82,7 +83,7 @@ export const CustomPDFViewer = () => {
           props.pageIndex === selectedPages[props.pageIndex] ? color : "#fff",
         cursor: "pointer",
         padding: "0.1rem",
-        width: "9rem",
+        width: "7rem",
       }}
     >
       <div
@@ -104,6 +105,12 @@ export const CustomPDFViewer = () => {
       </div>
     </div>
   );
+
+  const handleDocumentLoad = (e: DocumentLoadEvent) => {
+    const pages = ` ${e.doc.numPages}`;
+    dispatch(totalPages(pages));
+  };
+
   return (
     <>
       {/* CustomToolbar */}
@@ -184,21 +191,34 @@ export const CustomPDFViewer = () => {
           }}
         </Toolbar>
       </div>
-      {/* Custom Thumbnail */}
+
       <div
         style={{
           border: "1px solid rgba(0, 0, 0, 0.1)",
           display: "flex",
           height: "50rem",
+          // width: "50rem"
         }}
       >
+        {/* Custom Thumbnail */}
         <div
           style={{
             borderRight: "1px solid rgba(0, 0, 0, 0.1)",
-            width: "13%",
           }}
         >
-          <Thumbnails renderThumbnailItem={renderThumbnailItem} />
+          <label>
+            <input type="radio" value="Ship" />
+            Ship
+          </label>{"  "}
+          <label>
+            <input type="radio" value="Non-Ship" />
+            Non-Ship
+          </label>
+          <div style={{ border: "1px solid rgba(0, 0, 0, 0.1)", textAlign: "center",  width: "12rem" }}>Medical Records</div>
+          <Row xs={7}>
+            <Col xs={3} style={{borderRight: "1px solid rgba(0, 0, 0, 0.2)", height : "46.7rem",width: "3rem"}}><Sidebar /></Col>
+            <Col xs={4} style={{height : "46rem",  width: "10rem"}}><Thumbnails renderThumbnailItem={renderThumbnailItem} /></Col>
+          </Row>
         </div>
         <div
           style={{
@@ -208,6 +228,7 @@ export const CustomPDFViewer = () => {
         >
           <Viewer
             fileUrl="assets/sample.pdf"
+            onDocumentLoad={handleDocumentLoad}
             plugins={[thumbnailPluginInstance, toolbarPluginInstance]}
           />
         </div>
