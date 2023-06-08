@@ -51,6 +51,9 @@ export const CustomPDFViewer = () => {
   const [selectedPages, setSelectedPages] = useState<any[]>([0]);
   const [color, setColor] = useState<string>("rgba(0, 0, 0, 0.3)");
 
+  const [selectedOption, setSelectedOption] = useState("Ship");
+  const [docTitle, setDocTitle] = useState();
+
   const handleChoosePage = (e: any, props: any) => {
     console.log(props);
     console.log("initial", props.renderPageThumbnail.props.pageRotation);
@@ -111,6 +114,13 @@ export const CustomPDFViewer = () => {
     dispatch(totalPages(pages));
   };
 
+  const handleOptionChange = (event: any) => {
+    setSelectedOption(event.target.value);
+  };
+
+  const handelDocTitle = (docTitle : any) =>{
+    setDocTitle(docTitle);
+  }
   return (
     <>
       {/* CustomToolbar */}
@@ -206,33 +216,43 @@ export const CustomPDFViewer = () => {
             borderRight: "1px solid rgba(0, 0, 0, 0.1)",
           }}
         >
-          <label>
-            <input type="radio" value="Ship" />
-            Ship
-          </label>{"  "}
-          <label>
-            <input type="radio" value="Non-Ship" />
-            Non-Ship
-          </label>
-          <div style={{ border: "1px solid rgba(0, 0, 0, 0.1)", textAlign: "center",  width: "12rem" }}>Medical Records</div>
-          <Row xs={7}>
-            <Col xs={3} style={{borderRight: "1px solid rgba(0, 0, 0, 0.2)", height : "46.7rem",width: "3rem"}}><Sidebar /></Col>
-            <Col xs={4} style={{height : "46rem",  width: "10rem"}}><Thumbnails renderThumbnailItem={renderThumbnailItem} /></Col>
-          </Row>
+          <div>
+            <label>
+              <input
+                type="radio"
+                value="Ship"
+                checked={selectedOption === 'Ship'}
+                onChange={handleOptionChange} />
+              Ship
+            </label>{"  "}
+            <label>
+              <input
+                type="radio"
+                value="Non-Ship"
+                checked={selectedOption === 'Non-Ship'}
+                onChange={handleOptionChange} />
+                  Non - Ship
+            </label>
+          </div>
+            <div style={{ border: "1px solid rgba(0, 0, 0, 0.1)", textAlign: "center", width: "12rem" }}>{docTitle}</div>
+            <Row xs={7}>
+              <Col xs={3} style={{ borderRight: "1px solid rgba(0, 0, 0, 0.2)", height: "46.7rem", width: "3rem" }}><Sidebar selectedOption ={selectedOption} docName ={handelDocTitle} /></Col>
+              <Col xs={4} style={{ height: "46rem", width: "10rem" }}><Thumbnails renderThumbnailItem={renderThumbnailItem} /></Col>
+            </Row>
+          </div>
+          <div
+            style={{
+              flex: 1,
+              overflow: "hidden",
+            }}
+          >
+            <Viewer
+              fileUrl="assets/sample.pdf"
+              onDocumentLoad={handleDocumentLoad}
+              plugins={[thumbnailPluginInstance, toolbarPluginInstance]}
+            />
+          </div>
         </div>
-        <div
-          style={{
-            flex: 1,
-            overflow: "hidden",
-          }}
-        >
-          <Viewer
-            fileUrl="assets/sample.pdf"
-            onDocumentLoad={handleDocumentLoad}
-            plugins={[thumbnailPluginInstance, toolbarPluginInstance]}
-          />
-        </div>
-      </div>
     </>
-  );
+      );
 };
