@@ -8,13 +8,14 @@ import {
   RotateBackwardIcon,
   RotateForwardIcon,
 } from "@react-pdf-viewer/rotate";
-import { CloseButton, Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
+import { Button, CloseButton, Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { deletedPages, totalPages } from "../Strore/SelecetedPageSclice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Strore/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { pageSelected } from "../Strore/SelecetedPageSclice";
 import { Sidebar } from "./Sidebar";
+import { current } from "@reduxjs/toolkit";
 
 export const CustomPDFViewer = () => {
   const dispatch = useDispatch();
@@ -47,6 +48,11 @@ export const CustomPDFViewer = () => {
   const { Toolbar } = toolbarPluginInstance;
   const rotatePluginInstance = toolbarPluginInstance.rotatePluginInstance;
   const { RotatePage } = rotatePluginInstance;
+
+  const [totalPDFPages, setTotalPDFPages] = useState<any>(0);
+  const [currentPage, setCurrenrPage] = useState<number>(1);
+  const [startPageNumber, setStartPageNumber] = useState<number>();
+  const [endPageNumber, setEndPageNumber] = useState<number>();
 
   const [selectedPages, setSelectedPages] = useState<any[]>([0]);
   const [color, setColor] = useState<string>("rgba(0, 0, 0, 0.3)");
@@ -111,6 +117,7 @@ export const CustomPDFViewer = () => {
 
   const handleDocumentLoad = (e: DocumentLoadEvent) => {
     const pages = ` ${e.doc.numPages}`;
+    setTotalPDFPages(+pages);
     dispatch(totalPages(pages));
   };
 
@@ -118,8 +125,35 @@ export const CustomPDFViewer = () => {
     setSelectedOption(event.target.value);
   };
 
-  const handelDocTitle = (docTitle : any) =>{
+  const handelDocTitle = (docTitle: any) => {
     setDocTitle(docTitle);
+  }
+
+  const pageNumbers = Array.from({ length: totalPDFPages }, (_, index) => index + 1);
+  const lastValue = pageNumbers.length;
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * 19;
+    const endIndex = startIndex + 19;
+    const lastIndex = pageNumbers.lastIndexOf(lastValue);
+    if (startIndex >= 0 && endIndex <= lastValue) {
+      setStartPageNumber(startIndex);
+      setEndPageNumber(endIndex);
+    }
+    // const displayedPages = pageNumbers.slice(startIndex, endIndex);
+  }, [totalPDFPages, currentPage])
+
+  const ShowNextPage = () => {
+    const currentValue = currentPage * 19;
+    if(currentValue < lastValue){
+      console.log(currentPage)
+      setCurrenrPage(currentPage + 1);
+    }
+  }
+  const ShowPreviousPage = () => {
+    if (currentPage > 1) {
+      console.log(currentPage)
+      setCurrenrPage(currentPage - 1);
+    }
   }
   return (
     <>
@@ -146,6 +180,13 @@ export const CustomPDFViewer = () => {
                   width: "100%",
                 }}
               >
+
+                <div style={{ padding: "0px 20px" }}>
+                  <img src="icons/rewind.svg" onClick={ShowPreviousPage} />
+                </div>{' '}{startPageNumber} - {endPageNumber}{' '}
+                <div style={{ padding: "0px 20px" }}>
+                  <img src="icons/fast-forward.svg" onClick={ShowNextPage} />
+                </div>
                 <div style={{ padding: "0px 2px" }}>
                   <ZoomOut />
                 </div>
@@ -231,28 +272,28 @@ export const CustomPDFViewer = () => {
                 value="Non-Ship"
                 checked={selectedOption === 'Non-Ship'}
                 onChange={handleOptionChange} />
-                  Non - Ship
+              Non - Ship
             </label>
           </div>
-            <div style={{ border: "1px solid rgba(0, 0, 0, 0.1)", textAlign: "center", width: "12rem" }}>{docTitle}</div>
-            <Row xs={7}>
-              <Col xs={3} style={{ borderRight: "1px solid rgba(0, 0, 0, 0.2)", height: "46.7rem", width: "3rem" }}><Sidebar selectedOption ={selectedOption} docName ={handelDocTitle} /></Col>
-              <Col xs={4} style={{ height: "46rem", width: "10rem" }}><Thumbnails renderThumbnailItem={renderThumbnailItem} /></Col>
-            </Row>
-          </div>
-          <div
-            style={{
-              flex: 1,
-              overflow: "hidden",
-            }}
-          >
-            <Viewer
-              fileUrl="assets/sample.pdf"
-              onDocumentLoad={handleDocumentLoad}
-              plugins={[thumbnailPluginInstance, toolbarPluginInstance]}
-            />
-          </div>
+          <div style={{ border: "1px solid rgba(0, 0, 0, 0.1)", textAlign: "center", width: "12rem" }}>{docTitle}</div>
+          <Row xs={7}>
+            <Col xs={3} style={{ borderRight: "1px solid rgba(0, 0, 0, 0.2)", height: "46.7rem", width: "3rem" }}><Sidebar selectedOption={selectedOption} docName={handelDocTitle} /></Col>
+            <Col xs={4} style={{ height: "46rem", width: "10rem" }}><Thumbnails renderThumbnailItem={renderThumbnailItem} /></Col>
+          </Row>
         </div>
+        <div
+          style={{
+            flex: 1,
+            overflow: "hidden",
+          }}
+        >
+          <Viewer
+            fileUrl="assets/MultiPage.pdf"
+            onDocumentLoad={handleDocumentLoad}
+            plugins={[thumbnailPluginInstance, toolbarPluginInstance]}
+          />
+        </div>
+      </div>
     </>
-      );
+  );
 };
