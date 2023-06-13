@@ -1,21 +1,20 @@
-import {
-  RenderThumbnailItemProps,
-  thumbnailPlugin,
-} from "@react-pdf-viewer/thumbnail";
+import { attachmentPlugin } from '@react-pdf-viewer/attachment';
 import { DocumentLoadEvent, MinimalButton, RotateDirection, Viewer } from "@react-pdf-viewer/core";
-import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
 import {
   RotateBackwardIcon,
-  RotateForwardIcon,
+  RotateForwardIcon
 } from "@react-pdf-viewer/rotate";
-import { Button, CloseButton, Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
-import { deletedPages, totalPages } from "../Strore/SelecetedPageSclice";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../Strore/store";
+import {
+  RenderThumbnailItemProps,
+  thumbnailPlugin
+} from "@react-pdf-viewer/thumbnail";
+import { toolbarPlugin, ToolbarSlot } from "@react-pdf-viewer/toolbar";
 import { useEffect, useState } from "react";
-import { pageSelected } from "../Strore/SelecetedPageSclice";
+import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { deletedPages, pageSelected, totalPages } from "../Strore/SelecetedPageSclice";
+import { RootState } from "../Strore/store";
 import { Sidebar } from "./Sidebar";
-import { current } from "@reduxjs/toolkit";
 
 export const CustomPDFViewer = () => {
   const dispatch = useDispatch();
@@ -26,21 +25,18 @@ export const CustomPDFViewer = () => {
   const { Thumbnails } = thumbnailPluginInstance;
 
   const rotateForward = (props: any) => {
-    console.log(props);
     const selectedPageNumbers = selectedPages.filter(Number.isFinite);
     selectedPageNumbers.map((pages) => {
       props.onRotatePage(pages, RotateDirection.Forward);
     });
   };
   const rotateBackward = (props: any) => {
-    console.log(props);
     const selectedPageNumbers = selectedPages.filter(Number.isFinite);
     selectedPageNumbers.map((pages) => {
       props.onRotatePage(pages, RotateDirection.Backward);
     });
   };
   const deletePages = () => {
-    console.log("deletePages");
     dispatch(deletedPages(selectedPages));
   };
 
@@ -49,6 +45,8 @@ export const CustomPDFViewer = () => {
   const rotatePluginInstance = toolbarPluginInstance.rotatePluginInstance;
   const { RotatePage } = rotatePluginInstance;
 
+  const attachmentPluginInstance = attachmentPlugin();
+  const { Attachments } = attachmentPluginInstance;
   const [totalPDFPages, setTotalPDFPages] = useState<any>(0);
   const [currentPage, setCurrenrPage] = useState<number>(1);
   const [startPageNumber, setStartPageNumber] = useState<number>();
@@ -59,10 +57,10 @@ export const CustomPDFViewer = () => {
 
   const [selectedOption, setSelectedOption] = useState("Ship");
   const [docTitle, setDocTitle] = useState();
+  const [showAttachment, setShowAttachment] = useState(false)
 
   const handleChoosePage = (e: any, props: any) => {
-    console.log(props);
-    console.log("initial", props.renderPageThumbnail.props.pageRotation);
+    // console.log("initial", props.renderPageThumbnail.props.pageRotation);
     if (e.ctrlKey) {
       if (selectedPages[props.pageIndex] === undefined) {
         const copy = [...selectedPages];
@@ -129,29 +127,37 @@ export const CustomPDFViewer = () => {
     setDocTitle(docTitle);
   }
 
-  const pageNumbers = Array.from({ length: totalPDFPages }, (_, index) => index + 1);
+  const pageNumbers = Array.from({ length: totalPDFPages }, (index: number) => index + 1);
   const lastValue = pageNumbers.length;
+  // const lastIndex = pageNumbers.lastIndexOf(lastValue);
+
   useEffect(() => {
-    const startIndex = (currentPage - 1) * 19;
-    const endIndex = startIndex + 19;
-    const lastIndex = pageNumbers.lastIndexOf(lastValue);
-    if (startIndex >= 0 && endIndex <= lastValue) {
-      setStartPageNumber(startIndex);
-      setEndPageNumber(endIndex);
+    if (pageNumbers.length > 10) {
+      const splitPages = pageNumbers.length / 2;
+      const endVale = Math.round(splitPages);
+      const startIndex = (currentPage - 1) * endVale;
+      const endIndex = startIndex + endVale;
+      if (startIndex >= 0 && endIndex <= lastValue) {
+        setStartPageNumber(startIndex);
+        setEndPageNumber(endIndex);
+      }
+    } else {
+
+      setStartPageNumber(1);
+      setEndPageNumber(pageNumbers.length);
     }
     // const displayedPages = pageNumbers.slice(startIndex, endIndex);
+
   }, [totalPDFPages, currentPage])
 
   const ShowNextPage = () => {
     const currentValue = currentPage * 19;
-    if(currentValue < lastValue){
-      console.log(currentPage)
+    if (currentValue < lastValue) {
       setCurrenrPage(currentPage + 1);
     }
   }
   const ShowPreviousPage = () => {
     if (currentPage > 1) {
-      console.log(currentPage)
       setCurrenrPage(currentPage - 1);
     }
   }
@@ -171,6 +177,7 @@ export const CustomPDFViewer = () => {
               ZoomIn,
               ZoomOut,
               Open,
+              Print
             } = slots;
             return (
               <div
@@ -180,13 +187,25 @@ export const CustomPDFViewer = () => {
                   width: "100%",
                 }}
               >
-
-                <div style={{ padding: "0px 20px" }}>
-                  <img src="icons/rewind.svg" onClick={ShowPreviousPage} />
-                </div>{' '}{startPageNumber} - {endPageNumber}{' '}
-                <div style={{ padding: "0px 20px" }}>
-                  <img src="icons/fast-forward.svg" onClick={ShowNextPage} />
-                </div>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={<Tooltip id="button-tooltip-2">Previous</Tooltip>}
+                >
+                  <div style={{ padding: "0px 20px", cursor: "pointer" }}>
+                    <img src="icons/rewind.svg" onClick={ShowPreviousPage} />
+                  </div>
+                </OverlayTrigger>
+                {' '}{startPageNumber} - {endPageNumber}{' '}
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={<Tooltip id="button-tooltip-2">Next</Tooltip>}
+                >
+                  <div style={{ padding: "0px 20px", cursor: "pointer" }}>
+                    <img src="icons/fast-forward.svg" onClick={ShowNextPage} />
+                  </div>
+                </OverlayTrigger>
                 <div style={{ padding: "0px 2px" }}>
                   <ZoomOut />
                 </div>
@@ -215,28 +234,56 @@ export const CustomPDFViewer = () => {
                   <Open />
                 </div>
                 <div style={{ padding: "0px 2px" }}>
-                  <RotatePage>
-                    {(props) => (
-                      <MinimalButton onClick={() => rotateForward(props)}>
-                        <RotateForwardIcon />
-                      </MinimalButton>
-                    )}
-                  </RotatePage>{" "}
-                  <RotatePage>
-                    {(props) => (
-                      <MinimalButton onClick={() => rotateBackward(props)}>
-                        <RotateBackwardIcon />
-                      </MinimalButton>
-                    )}
-                  </RotatePage>
-                  <OverlayTrigger
-                    placement="bottom"
-                    delay={{ show: 250, hide: 400 }}
-                    overlay={<Tooltip id="button-tooltip-2">Delete</Tooltip>}
-                  >
-                    <CloseButton onClick={deletePages} />
-                  </OverlayTrigger>
+                  <Print />
                 </div>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={<Tooltip id="button-tooltip-2">Forward</Tooltip>}
+                >
+                  <div style={{ padding: "0px 2px" }}>
+                    <RotatePage>
+                      {(props) => (
+                        <MinimalButton onClick={() => rotateForward(props)}>
+                          <RotateForwardIcon />
+                        </MinimalButton>
+                      )}
+                    </RotatePage>
+                  </div>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={<Tooltip id="button-tooltip-2">Backward</Tooltip>}
+                >
+                  <div>
+                    <RotatePage>
+                      {(props) => (
+                        <MinimalButton onClick={() => rotateBackward(props)}>
+                          <RotateBackwardIcon />
+                        </MinimalButton>
+                      )}
+                    </RotatePage>
+                  </div>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={<Tooltip id="button-tooltip-2">Delete</Tooltip>}
+                >
+                  <div style={{ padding: "0px 20px", cursor: "pointer" }}>
+                    <img src="icons/trash.svg" onClick={deletePages} />
+                  </div>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 50, hide: 100 }}
+                  overlay={<Tooltip id="button-tooltip-2">Attachments</Tooltip>}
+                >
+                  <div style={{ padding: "0px 10px", cursor: "pointer" }}>
+                    <img src="icons/paperclip.svg" onClick={() => { setShowAttachment(!showAttachment) }} />
+                  </div>
+                </OverlayTrigger>
               </div>
             );
           }}
@@ -287,10 +334,15 @@ export const CustomPDFViewer = () => {
             overflow: "hidden",
           }}
         >
+          {showAttachment &&
+            <div >
+              <Attachments />
+            </div>}
           <Viewer
             fileUrl="assets/MultiPage.pdf"
             onDocumentLoad={handleDocumentLoad}
-            plugins={[thumbnailPluginInstance, toolbarPluginInstance]}
+            defaultScale={0.90}
+            plugins={[thumbnailPluginInstance, toolbarPluginInstance, attachmentPluginInstance]}
           />
         </div>
       </div>

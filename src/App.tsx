@@ -21,13 +21,11 @@ function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     if (readyState === 1) {
-      console.log("hit")
       dispatch(setWebSocketConnection(socket))
     }
   }, [readyState])
   useEffect(() => {
     if (lastMessage !== null) {
-      console.log("hit2")
       dispatch(setLastJSONMessage(lastMessage))
       // dispatch(setWebSocketConnection(socket))
     }
@@ -37,9 +35,8 @@ function App() {
 
     <Container fluid style={{ paddingTop: 20 }}>
       <Row xs={12}>
-        <Col xs={7} >
+        <Col xs={5} >
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-            {/* <SelectThumbnail  /> */}
             <CustomPDFViewer />
           </Worker>
         </Col>
