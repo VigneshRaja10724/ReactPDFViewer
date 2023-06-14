@@ -58,6 +58,8 @@ export const CustomPDFViewer = () => {
   const [selectedOption, setSelectedOption] = useState("Ship");
   const [docTitle, setDocTitle] = useState();
   const [showAttachment, setShowAttachment] = useState(false)
+  const [url, setUrl] = useState("assets/MultiPage.pdf");
+  const [header, setHeader] = useState();
 
   const handleChoosePage = (e: any, props: any) => {
     // console.log("initial", props.renderPageThumbnail.props.pageRotation);
@@ -324,7 +326,13 @@ export const CustomPDFViewer = () => {
           </div>
           <div style={{ border: "1px solid rgba(0, 0, 0, 0.1)", textAlign: "center", width: "12rem" }}>{docTitle}</div>
           <Row xs={7}>
-            <Col xs={3} style={{ borderRight: "1px solid rgba(0, 0, 0, 0.2)", height: "46.7rem", width: "3rem" }}><Sidebar selectedOption={selectedOption} docName={handelDocTitle} /></Col>
+            <Col xs={3} style={{ borderRight: "1px solid rgba(0, 0, 0, 0.2)", height: "46.7rem", width: "3rem" }}>
+              <Sidebar
+               selectedOption={selectedOption}
+                docName={handelDocTitle} 
+                url = {setUrl}
+                header = {setHeader} />
+            </Col>
             <Col xs={4} style={{ height: "46rem", width: "10rem" }}><Thumbnails renderThumbnailItem={renderThumbnailItem} /></Col>
           </Row>
         </div>
@@ -339,7 +347,8 @@ export const CustomPDFViewer = () => {
               <Attachments />
             </div>}
           <Viewer
-            fileUrl="assets/MultiPage.pdf"
+            fileUrl={url}
+            httpHeaders = {header}
             onDocumentLoad={handleDocumentLoad}
             defaultScale={0.90}
             plugins={[thumbnailPluginInstance, toolbarPluginInstance, attachmentPluginInstance]}

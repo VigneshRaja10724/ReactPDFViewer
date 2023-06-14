@@ -4,6 +4,7 @@ import { Col, Container, Row } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import useWebSocket from "react-use-websocket";
 import "./App.css";
+import { CustomViewer } from "./Components/CustomViewer";
 import { LoadSelectedThumbnails } from "./Components/LoadThumbnails";
 import { CustomPDFViewer } from "./Components/PDFViewer";
 import { setLastJSONMessage, setWebSocketConnection } from "./Strore/WebsocketSlice";
@@ -38,6 +39,7 @@ function App() {
         <Col xs={5} >
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
             <CustomPDFViewer />
+            {/* <CustomViewer /> */}
           </Worker>
         </Col>
         <Col xs={5}>
