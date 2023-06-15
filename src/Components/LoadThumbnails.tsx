@@ -1,6 +1,7 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Strore/store";
 import { useEffect, useState } from "react";
+import { setLastJSONMessage } from "../Strore/WebsocketSlice";
 
 interface socket {
   readyState: number,
@@ -14,6 +15,7 @@ export const LoadSelectedThumbnails = () => {
   const [deletedPages, setDeletedPages] = useState<any>([]);
   const [connection, setConnection] = useState<any>();
   const [message, setMessage] = useState<any>();
+  const dispatch = useDispatch();
   const state = useSelector((state: RootState) => state);
   const websocket = state.websocket;
   const pdf = state.selectPage;
@@ -55,6 +57,9 @@ export const LoadSelectedThumbnails = () => {
 
   useEffect(() => {
     console.log(websocket.lastMessage)
+    // const data =JSON.parse(websocket.lastMessage.data)
+    // console.log(data);
+    dispatch(setLastJSONMessage(websocket.lastMessage))
   }, [websocket.lastMessage])
 
   return (

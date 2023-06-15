@@ -17,31 +17,17 @@ import { RootState } from "../Strore/store";
 import { Sidebar } from "./Sidebar";
 
 export const CustomPDFViewer = () => {
+
   const dispatch = useDispatch();
-  const pdf = useSelector((state: RootState) => state.selectPage);
+
   const thumbnailPluginInstance = thumbnailPlugin({
     thumbnailWidth: 100,
   });
   const { Thumbnails } = thumbnailPluginInstance;
 
-  const rotateForward = (props: any) => {
-    const selectedPageNumbers = selectedPages.filter(Number.isFinite);
-    selectedPageNumbers.map((pages) => {
-      props.onRotatePage(pages, RotateDirection.Forward);
-    });
-  };
-  const rotateBackward = (props: any) => {
-    const selectedPageNumbers = selectedPages.filter(Number.isFinite);
-    selectedPageNumbers.map((pages) => {
-      props.onRotatePage(pages, RotateDirection.Backward);
-    });
-  };
-  const deletePages = () => {
-    dispatch(deletedPages(selectedPages));
-  };
-
   const toolbarPluginInstance = toolbarPlugin();
   const { Toolbar } = toolbarPluginInstance;
+
   const rotatePluginInstance = toolbarPluginInstance.rotatePluginInstance;
   const { RotatePage } = rotatePluginInstance;
 
@@ -60,6 +46,22 @@ export const CustomPDFViewer = () => {
   const [showAttachment, setShowAttachment] = useState(false)
   const [url, setUrl] = useState("assets/MultiPage.pdf");
   const [header, setHeader] = useState();
+
+  const rotateForward = (props: any) => {
+    const selectedPageNumbers = selectedPages.filter(Number.isFinite);
+    selectedPageNumbers.map((pages) => {
+      props.onRotatePage(pages, RotateDirection.Forward);
+    });
+  };
+  const rotateBackward = (props: any) => {
+    const selectedPageNumbers = selectedPages.filter(Number.isFinite);
+    selectedPageNumbers.map((pages) => {
+      props.onRotatePage(pages, RotateDirection.Backward);
+    });
+  };
+  const deletePages = () => {
+    dispatch(deletedPages(selectedPages));
+  };
 
   const handleChoosePage = (e: any, props: any) => {
     // console.log("initial", props.renderPageThumbnail.props.pageRotation);
@@ -328,10 +330,10 @@ export const CustomPDFViewer = () => {
           <Row xs={7}>
             <Col xs={3} style={{ borderRight: "1px solid rgba(0, 0, 0, 0.2)", height: "46.7rem", width: "3rem" }}>
               <Sidebar
-               selectedOption={selectedOption}
-                docName={handelDocTitle} 
-                url = {setUrl}
-                header = {setHeader} />
+                selectedOption={selectedOption}
+                docName={handelDocTitle}
+                url={setUrl}
+                header={setHeader} />
             </Col>
             <Col xs={4} style={{ height: "46rem", width: "10rem" }}><Thumbnails renderThumbnailItem={renderThumbnailItem} /></Col>
           </Row>
@@ -348,7 +350,7 @@ export const CustomPDFViewer = () => {
             </div>}
           <Viewer
             fileUrl={url}
-            httpHeaders = {header}
+            httpHeaders={header}
             onDocumentLoad={handleDocumentLoad}
             defaultScale={0.90}
             plugins={[thumbnailPluginInstance, toolbarPluginInstance, attachmentPluginInstance]}
