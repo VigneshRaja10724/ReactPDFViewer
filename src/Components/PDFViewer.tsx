@@ -64,6 +64,7 @@ export const CustomPDFViewer = () => {
   };
 
   const handleChoosePage = (e: any, props: any) => {
+    console.log(props)
     // console.log("initial", props.renderPageThumbnail.props.pageRotation);
     if (e.ctrlKey) {
       if (selectedPages[props.pageIndex] === undefined) {
