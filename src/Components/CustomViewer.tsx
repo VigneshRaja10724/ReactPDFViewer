@@ -6,7 +6,7 @@ import { useState } from "react";
 
 export const CustomViewer = () => {
 
-    const [thumbnails, setThumbnails] = useState<any>([]);
+    const [thumbnailsSize, setThumbnailsSize] = useState<any[]>([]);
 
     const thumbnailPluginInstance = thumbnailPlugin();
     const { Thumbnails } = thumbnailPluginInstance;
@@ -14,7 +14,7 @@ export const CustomViewer = () => {
     const handelDocumentload = (e: DocumentLoadEvent) => {
         const pages = ` ${e.doc.numPages}`;
         const loadedThumbnails = Array.from({ length: +pages }, (_, index) => index);
-        setThumbnails(loadedThumbnails)
+        setThumbnailsSize(loadedThumbnails)
     }
     return (
         <>
@@ -31,7 +31,7 @@ export const CustomViewer = () => {
                         width: '20%',
                     }}
                 >
-                    <CustomThumbnail Thumbnails={Thumbnails} thumbnailSize = {thumbnails} />
+                    <CustomThumbnail Thumbnails={Thumbnails} thumbnailSize = {thumbnailsSize} />
                 </div>
                 <div
                     style={{
