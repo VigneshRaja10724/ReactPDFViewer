@@ -1,20 +1,17 @@
 import { DocumentLoadEvent, Viewer } from "@react-pdf-viewer/core"
 import { thumbnailPlugin } from '@react-pdf-viewer/thumbnail';
 import { CustomThumbnail } from "./CustomThumbanil";
-import { useDrop } from "react-dnd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const CustomViewer = () => {
 
-    const [thumbnailsSize, setThumbnailsSize] = useState<any[]>([]);
+
 
     const thumbnailPluginInstance = thumbnailPlugin();
     const { Thumbnails } = thumbnailPluginInstance;
     
     const handelDocumentload = (e: DocumentLoadEvent) => {
         const pages = ` ${e.doc.numPages}`;
-        const loadedThumbnails = Array.from({ length: +pages }, (_, index) => index);
-        setThumbnailsSize(loadedThumbnails)
     }
     return (
         <>
@@ -31,7 +28,7 @@ export const CustomViewer = () => {
                         width: '20%',
                     }}
                 >
-                    <CustomThumbnail Thumbnails={Thumbnails} thumbnailSize = {thumbnailsSize} />
+                    <CustomThumbnail Thumbnails={Thumbnails}  />
                 </div>
                 <div
                     style={{

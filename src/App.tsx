@@ -4,11 +4,11 @@ import { Col, Container, Row } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import useWebSocket from "react-use-websocket";
 import "./App.css";
-import { LoadSelectedThumbnails } from "./Components/LoadThumbnails";
-import { CustomPDFViewer } from "./Components/PDFViewer";
-import { setLastJSONMessage, setWebSocketConnection } from "./Strore/WebsocketSlice";
 import { CustomViewer } from "./Components/CustomViewer";
-
+import { LoadSelectedThumbnails } from "./Components/LoadThumbnails";
+import { setLastJSONMessage, setWebSocketConnection } from "./Strore/WebsocketSlice";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 
 function App() {
@@ -39,7 +39,9 @@ function App() {
         <Col xs={5} >
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
             {/* <CustomPDFViewer /> */}
+            <DndProvider backend={HTML5Backend}>
             <CustomViewer />
+            </DndProvider>
           </Worker>
         </Col>
         <Col xs={5}>
