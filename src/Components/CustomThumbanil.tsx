@@ -1,66 +1,15 @@
 import { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../Strore/store";
-import { Thumbnail } from "./Thumbnails";
+import { useDispatch } from "react-redux";
+import { DragDropComponent } from "./DragDropComponent";
+import { RenderTHumbnails } from "./RenderThumbnails";
 
 
-export const CustomThumbnail = ({ Thumbnails }: any) => {
-    const [updatedIndexs, setUpdatedIndexs] = useState<any[]>();
-    const state = useSelector((state: RootState) => state);
-    const thumbnails = state.thumbnails;
-
-    useEffect(()=>{
-        console.log(Thumbnails)
-    },[])
-    
-    useEffect(()=>{
-        console.log(thumbnails)
-      },[thumbnails])
-
-    useEffect(()=>{
-        console.log(updatedIndexs)
-    },[updatedIndexs])
-   
-
-    const renderThumbnailItem = (props: RenderThumbnailItemProps) =>{
-        // dispatch(addThumbnail(props))
-        return(
-        <div
-            key={props.pageIndex}
-            className="custom-thumbnail-item"
-            data-testid={`thumbnail-${props.pageIndex}`}
-            style={{
-                backgroundColor: props.pageIndex === props.currentPage ? 'rgba(0, 0, 0, 0.3)' : '#fff',
-                cursor: 'pointer',
-                padding: '0.5rem',
-                width: '100%',
-            }}
-        >
-            <div style={{ marginBottom: '0.5rem' }} onClick={props.onJumpToPage}>
-
-                <Thumbnail
-                    index={props.pageIndex}
-                    thumbnail={props.renderPageThumbnail}
-                    initialThumbnailsIndex={thumbnails}
-                    setUpdatedIndexs = { setUpdatedIndexs}
-                />
-            </div>
-            <div
-                style={{
-                    alignItems: 'center',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    margin: '0 auto',
-                    width: '100px',
-                }}
-            >
-                <div style={{ marginRight: 'auto' }}>
-                    {props.renderPageLabel}
-                </div>
-
-            </div>
-        </div>
+export const CustomThumbnail = ({ Thumbnails, totalPages }: any) => {
+    console.log("CT")
+    const renderThumbnailItem = (props: RenderThumbnailItemProps) => {
+        console.log("render")
+      return (
+        <RenderTHumbnails key={props.key} props={props} totalPages={totalPages}/>
     );}
     return (
         <>

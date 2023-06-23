@@ -7,30 +7,28 @@ import "./App.css";
 import { CustomViewer } from "./Components/CustomViewer";
 import { LoadSelectedThumbnails } from "./Components/LoadThumbnails";
 import { setLastJSONMessage, setWebSocketConnection } from "./Strore/WebsocketSlice";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 
 
 function App() {
-  const [socketUrl, SetSocketUrl] = useState(
-    "wss://trayapp.smartcorp.net:8889/?aHR0cDovL2xvY2FsaG9zdDo5MDkxLyMvZGFzaGJvYXJkL2hvbWU="
-  );
+  // const [socketUrl, SetSocketUrl] = useState(
+  //   "wss://trayapp.smartcorp.net:8889/?aHR0cDovL2xvY2FsaG9zdDo5MDkxLyMvZGFzaGJvYXJkL2hvbWU="
+  // );
 
-  const socket = useWebSocket(socketUrl);
-  const { readyState, sendJsonMessage, lastMessage } = socket;
+  // const socket = useWebSocket(socketUrl);
+  // const { readyState, sendJsonMessage, lastMessage } = socket;
 
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (readyState === 1) {
-      dispatch(setWebSocketConnection(socket))
-    }
-  }, [readyState])
-  useEffect(() => {
-    if (lastMessage !== null) {
-      dispatch(setLastJSONMessage(lastMessage))
-      // dispatch(setWebSocketConnection(socket))
-    }
-  }, [lastMessage])
+  // const dispatch = useDispatch();
+  // useEffect(() => {
+  //   if (readyState === 1) {
+  //     dispatch(setWebSocketConnection(socket))
+  //   }
+  // }, [readyState])
+  // useEffect(() => {
+  //   if (lastMessage !== null) {
+  //     dispatch(setLastJSONMessage(lastMessage))
+  //     // dispatch(setWebSocketConnection(socket))
+  //   }
+  // }, [lastMessage])
 
   return (
 
@@ -39,13 +37,11 @@ function App() {
         <Col xs={5} >
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
             {/* <CustomPDFViewer /> */}
-            <DndProvider backend={HTML5Backend}>
             <CustomViewer />
-            </DndProvider>
           </Worker>
         </Col>
         <Col xs={5}>
-          <LoadSelectedThumbnails />
+          {/* <LoadSelectedThumbnails /> */}
         </Col>
       </Row>
     </Container>
