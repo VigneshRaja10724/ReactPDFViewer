@@ -7,14 +7,17 @@ import { CustomThumbnail } from "./CustomThumbanil";
 
 export const CustomViewer = () => {
 console.log("CV")
-    const thumbnailPluginInstance = thumbnailPlugin();
+    const thumbnailPluginInstance = thumbnailPlugin({
+        
+    });
     const { Thumbnails, onDocumentLoad, onViewerStateChange , install} = thumbnailPluginInstance;
     const [totalPages, setTotalPages] = useState<number>();
-    console.log(thumbnailPluginInstance);
-    console.log(Thumbnails);
-    console.log(install);
-    console.log(onDocumentLoad);
-    console.log(onViewerStateChange);
+    // console.log(thumbnailPluginInstance);
+    // console.log(Viewer);
+    // console.log(Thumbnails);
+    // console.log(install);
+    // console.log(onDocumentLoad);
+    // console.log(onViewerStateChange);
 
     const handelDocumentload = (e: DocumentLoadEvent) => {
         const pages = ` ${e.doc.numPages}`;
@@ -39,6 +42,7 @@ console.log("CV")
                     }}
                 >
                     <DndProvider backend={HTML5Backend}>
+                        {/* <Thumbnails /> */}
                         <CustomThumbnail Thumbnails={Thumbnails} totalPages={totalPages} />
                     </DndProvider>
                 </div>
