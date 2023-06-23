@@ -10,6 +10,7 @@ import { setLastJSONMessage, setWebSocketConnection } from "./Strore/WebsocketSl
 
 
 function App() {
+  // console.log("APP")
   // const [socketUrl, SetSocketUrl] = useState(
   //   "wss://trayapp.smartcorp.net:8889/?aHR0cDovL2xvY2FsaG9zdDo5MDkxLyMvZGFzaGJvYXJkL2hvbWU="
   // );
