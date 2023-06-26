@@ -28,6 +28,8 @@ export const CustomThumbnail = ({ Thumbnails, totalPages }: any) => {
     }, [thumbnails.length === totalPages])
     useEffect(() => {
         console.log(Thumbnails)
+        const {ThumbnailListWithStore} = Thumbnails;
+        console.log(ThumbnailListWithStore)
     }, [])
 
     useEffect(() => {
@@ -40,10 +42,10 @@ export const CustomThumbnail = ({ Thumbnails, totalPages }: any) => {
         );
     }
 
-
     return (
         <>
-            <Thumbnails renderThumbnailItem={renderThumbnailItem} />
+            <Thumbnails renderThumbnailItem={renderThumbnailItem} /> :
+
         </>
     );
 
