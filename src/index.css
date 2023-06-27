@@ -27,3 +27,9 @@ code {
 .active {
   background-color: #1348b4;
 }
+
+.viewer {
+  overflow: auto;
+  height : 50rem;
+  position : relative;
+}

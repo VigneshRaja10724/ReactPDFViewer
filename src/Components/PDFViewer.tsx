@@ -8,12 +8,12 @@ import {
   RenderThumbnailItemProps,
   thumbnailPlugin
 } from "@react-pdf-viewer/thumbnail";
-import { toolbarPlugin, ToolbarSlot } from "@react-pdf-viewer/toolbar";
+import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
 import { useEffect, useState } from "react";
 import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { deletedPages, pageSelected, totalPages } from "../Strore/SelecetedPageSclice";
-import { RootState } from "../Strore/store";
+import { ZoomArea } from '../Types/ZoomArea';
 import { Sidebar } from "./Sidebar";
 
 export const CustomPDFViewer = () => {
@@ -37,15 +37,14 @@ export const CustomPDFViewer = () => {
   const [currentPage, setCurrenrPage] = useState<number>(1);
   const [startPageNumber, setStartPageNumber] = useState<number>();
   const [endPageNumber, setEndPageNumber] = useState<number>();
-
   const [selectedPages, setSelectedPages] = useState<any[]>([0]);
   const [color, setColor] = useState<string>("rgba(0, 0, 0, 0.3)");
-
   const [selectedOption, setSelectedOption] = useState("Ship");
   const [docTitle, setDocTitle] = useState();
   const [showAttachment, setShowAttachment] = useState(false)
   const [url, setUrl] = useState("assets/MultiPage.pdf");
   const [header, setHeader] = useState();
+
 
   const rotateForward = (props: any) => {
     const selectedPageNumbers = selectedPages.filter(Number.isFinite);
@@ -53,12 +52,14 @@ export const CustomPDFViewer = () => {
       props.onRotatePage(pages, RotateDirection.Forward);
     });
   };
+
   const rotateBackward = (props: any) => {
     const selectedPageNumbers = selectedPages.filter(Number.isFinite);
     selectedPageNumbers.map((pages) => {
       props.onRotatePage(pages, RotateDirection.Backward);
     });
   };
+
   const deletePages = () => {
     dispatch(deletedPages(selectedPages));
   };
@@ -166,6 +167,70 @@ export const CustomPDFViewer = () => {
       setCurrenrPage(currentPage - 1);
     }
   }
+
+  const [showMarquee, setShowMarquee] = useState<boolean>(true);
+  const [startX, setStartX] = useState<number | null>(null);
+  const [startY, setStartY] = useState<number | null>(null);
+  const [endX, setEndX] = useState<number | null>(null);
+  const [endY, setEndY] = useState<number | null>(null);
+  // const [zoomArea, setZoomArea] = useState<ZoomArea | null>(null);
+
+  const handleMouseDown = (event: React.MouseEvent<HTMLImageElement>) => {
+    if (event.button === 0) {
+      const { clientX, clientY } = event;
+      const { left, top } = event.currentTarget.getBoundingClientRect();
+
+      setStartX(clientX - left);
+      setStartY(clientY - top);
+      setEndX(null);
+      setEndY(null);
+    }
+  };
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLImageElement>) => {
+    if (startX !== null && startY !== null) {
+      const { clientX, clientY } = event;
+      const { left, top } = event.currentTarget.getBoundingClientRect();
+
+      setEndX(clientX - left);
+      setEndY(clientY - top);
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (startX !== null && startY !== null && endX !== null && endY !== null) {
+      // Do something with the selected area coordinates (startX, startY, endX, endY)
+      console.log('Selected Area:', { startX, startY, endX, endY });
+
+      // Perform action with the selected area coordinates
+      performAction(startX, startY, endX, endY);
+    }
+
+    setStartX(null);
+    setStartY(null);
+    setEndX(null);
+    setEndY(null);
+  };
+
+  const performAction = (startX: number, startY: number, endX: number, endY: number) => {
+    // Perform your desired action here
+    // Example: Display selected area dimensions
+    const width = Math.abs(endX - startX);
+    const height = Math.abs(endY - startY);
+    console.log(`Selected Area Dimensions: ${width} x ${height}`);
+  };
+
+  const handleMarquee = () => {
+    console.log("marquee")
+    setShowMarquee(false)
+  }
+
+  const handleFit = () => {
+    console.log("fit")
+    setShowMarquee(true)
+  }
+
+
   return (
     <>
       {/* CustomToolbar */}
@@ -211,6 +276,28 @@ export const CustomPDFViewer = () => {
                     <img src="icons/fast-forward.svg" onClick={ShowNextPage} />
                   </div>
                 </OverlayTrigger>
+                {
+                  showMarquee ?
+                    <OverlayTrigger
+                      placement="bottom"
+                      delay={{ show: 250, hide: 400 }}
+                      overlay={<Tooltip id="button-tooltip-2">Marquee Zoom</Tooltip>}
+                    >
+                      <div style={{ padding: "0px 20px", cursor: "pointer" }}>
+                        <img src="icons/search.svg" onClick={handleMarquee} />
+                      </div>
+                    </OverlayTrigger> :
+                    <OverlayTrigger
+                      placement="bottom"
+                      delay={{ show: 250, hide: 400 }}
+                      overlay={<Tooltip id="button-tooltip-2">Fit width</Tooltip>}
+                    >
+                      <div style={{ padding: "0px 20px", cursor: "pointer" }}>
+                        <img src="icons/search-heart.svg" onClick={handleFit} />
+                      </div>
+                    </OverlayTrigger>
+                }
+
                 <div style={{ padding: "0px 2px" }}>
                   <ZoomOut />
                 </div>
@@ -349,13 +436,31 @@ export const CustomPDFViewer = () => {
             <div >
               <Attachments />
             </div>}
-          <Viewer
-            fileUrl={url}
-            httpHeaders={header}
-            onDocumentLoad={handleDocumentLoad}
-            defaultScale={0.90}
-            plugins={[thumbnailPluginInstance, toolbarPluginInstance, attachmentPluginInstance]}
-          />
+          <div
+            className='viewer'
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}>
+            <Viewer
+              fileUrl={url}
+              httpHeaders={header}
+              onDocumentLoad={handleDocumentLoad}
+              defaultScale={0.90}
+              plugins={[thumbnailPluginInstance, toolbarPluginInstance, attachmentPluginInstance]}
+            />
+            {startX !== null && startY !== null && endX !== null && endY !== null && (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: Math.min(startX, endX),
+                  top: Math.min(startY, endY),
+                  width: Math.abs(endX - startX),
+                  height: Math.abs(endY - startY),
+                  border: '2px solid red',
+                }}
+              />
+            )}
+          </div>
         </div>
       </div>
     </>
