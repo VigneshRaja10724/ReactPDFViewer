@@ -7,8 +7,7 @@ import { CustomThumbnail } from "./CustomThumbanil";
 
 export const CustomViewer = () => {
 console.log("CV")
-    const thumbnailPluginInstance = thumbnailPlugin({
-    });
+    const thumbnailPluginInstance = thumbnailPlugin({});
     const { Thumbnails, onDocumentLoad, onViewerStateChange , install} = thumbnailPluginInstance;
     const [totalPages, setTotalPages] = useState<number>();
     console.log(thumbnailPluginInstance);
@@ -25,7 +24,7 @@ console.log("CV")
 
    const stateChange =  (viewerState : ViewerState) =>{
     console.log("hit")
-    console.log(viewerState)
+    // console.log(viewerState)
    }
 
 
