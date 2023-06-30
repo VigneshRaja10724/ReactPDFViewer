@@ -17,6 +17,7 @@ import { ZoomArea } from '../Types/ZoomArea';
 import { Sidebar } from "./Sidebar";
 import { RenderZoomProps } from '@react-pdf-viewer/zoom';
 import { SpecialZoomLevel } from '@react-pdf-viewer/core';
+import { deflate } from 'zlib';
 
 export const CustomPDFViewer = () => {
 
@@ -175,17 +176,15 @@ export const CustomPDFViewer = () => {
   const [startY, setStartY] = useState<number | null>(null);
   const [endX, setEndX] = useState<number | null>(null);
   const [endY, setEndY] = useState<number | null>(null);
+  const [scale, setScale] = useState<number>(1);
   // const [zoomArea, setZoomArea] = useState<ZoomArea | null>(null);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLImageElement>) => {
     if (event.button === 0 && !showMarquee) {
       const { clientX, clientY } = event;
       const { left, top } = event.currentTarget.getBoundingClientRect();
-
       setStartX(clientX - left);
       setStartY(clientY - top);
-      setEndX(null);
-      setEndY(null);
     }
   };
 
@@ -201,27 +200,29 @@ export const CustomPDFViewer = () => {
 
   const handleMouseUp = () => {
     if (startX !== null && startY !== null && endX !== null && endY !== null && !showMarquee) {
-      // Do something with the selected area coordinates (startX, startY, endX, endY)
-      console.log('Selected Area:', { startX, startY, endX, endY });
+      // console.log('Selected Area:', { startX, startY, endX, endY });
+    if(scale < 2){
+      console.log("h")
+      setScale(scale + 0.5)
+    }
     }
 
     setStartX(null);
     setStartY(null);
     setEndX(null);
     setEndY(null);
+
   };
 
-    const handleMarquee = () => {
-    console.log("marquee")
+  const handleMarquee = () => {
     setShowMarquee(false)
   }
 
   const handleFit = (props: any) => {
-    console.log("fit")
     props.onZoom(SpecialZoomLevel.PageFit)
     setShowMarquee(true)
+      setScale(1)
   }
-
 
   return (
     <>
@@ -300,7 +301,7 @@ export const CustomPDFViewer = () => {
                   <ZoomOut />
                 </div>
                 <div style={{ padding: "0px 2px" }}>
-                  <Zoom />
+                  <Zoom levels={[0.8, 1.2, 1.6, 2.4, 3.2]} />
                 </div>
                 <div style={{ padding: "0px 2px" }}>
                   <ZoomIn />
@@ -385,7 +386,6 @@ export const CustomPDFViewer = () => {
           border: "1px solid rgba(0, 0, 0, 0.1)",
           display: "flex",
           height: "50rem",
-          // width: "50rem"
         }}
       >
         {/* Custom Thumbnail */}
@@ -427,7 +427,9 @@ export const CustomPDFViewer = () => {
         <div
           style={{
             flex: 1,
-            overflow: "hidden",
+            width: "45rem",
+            overflowX: "auto",
+            overflowY: "hidden",
           }}
         >
           {showAttachment &&
@@ -440,18 +442,19 @@ export const CustomPDFViewer = () => {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             style={{
-              cursor : !showMarquee ? "zoom-in" : "default",
-              // transformOrigin : `${}px ${}px `
-              // transform : !showMarquee ? `scale(${2})` : "scale(1)"
+
+              cursor: !showMarquee ? "zoom-in" : "default",
+              transformOrigin: `${startX}px ${startY}px `,
+              transform:  `scale(${scale})`,
+              userSelect: !showMarquee ? 'none' : "text",
             }}>
             <Viewer
               fileUrl={url}
               httpHeaders={header}
               onDocumentLoad={handleDocumentLoad}
-              defaultScale={0.90}
               plugins={[thumbnailPluginInstance, toolbarPluginInstance, attachmentPluginInstance]}
             />
-            { !showMarquee && startX !== null && startY !== null && endX !== null && endY !== null && (
+            {!showMarquee && startX !== null && startY !== null && endX !== null && endY !== null && (
               <div
                 style={{
                   position: 'absolute',
