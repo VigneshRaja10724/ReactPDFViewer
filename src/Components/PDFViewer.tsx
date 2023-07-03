@@ -1,23 +1,23 @@
+import '@react-pdf-viewer/core/lib/styles/index.css';
 import { attachmentPlugin } from '@react-pdf-viewer/attachment';
-import { DocumentLoadEvent, MinimalButton, RotateDirection, Viewer } from "@react-pdf-viewer/core";
+import { DocumentLoadEvent, MinimalButton, RotateDirection, SpecialZoomLevel, Viewer, ZoomEvent } from "@react-pdf-viewer/core";
 import {
   RotateBackwardIcon,
   RotateForwardIcon
 } from "@react-pdf-viewer/rotate";
 import {
-  RenderThumbnailItemProps,
   thumbnailPlugin
 } from "@react-pdf-viewer/thumbnail";
 import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
+import { RenderZoomProps } from '@react-pdf-viewer/zoom';
 import { useEffect, useState } from "react";
 import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { deletedPages, pageSelected, totalPages } from "../Strore/SelecetedPageSclice";
-import { ZoomArea } from '../Types/ZoomArea';
+import { deletedPages, totalPages } from "../Strore/SelecetedPageSclice";
+import { CustomThumbnail } from './CustomThumbnail';
 import { Sidebar } from "./Sidebar";
-import { RenderZoomProps } from '@react-pdf-viewer/zoom';
-import { SpecialZoomLevel } from '@react-pdf-viewer/core';
-import { deflate } from 'zlib';
+import useCustomZoomPlugin from '../Plugin/ZoomPlugin';
+
 
 export const CustomPDFViewer = () => {
 
@@ -36,15 +36,19 @@ export const CustomPDFViewer = () => {
 
   const attachmentPluginInstance = attachmentPlugin();
   const { Attachments } = attachmentPluginInstance;
+
+  const customZoomPluginInstance = useCustomZoomPlugin();
+  const { zoomTo } = customZoomPluginInstance;
+
   const [totalPDFPages, setTotalPDFPages] = useState<any>(0);
   const [currentPage, setCurrenrPage] = useState<number>(1);
   const [startPageNumber, setStartPageNumber] = useState<number>();
   const [endPageNumber, setEndPageNumber] = useState<number>();
   const [selectedPages, setSelectedPages] = useState<any[]>([0]);
-  const [color, setColor] = useState<string>("rgba(0, 0, 0, 0.3)");
+  const [showAttachment, setShowAttachment] = useState(false)
+
   const [selectedOption, setSelectedOption] = useState("Ship");
   const [docTitle, setDocTitle] = useState();
-  const [showAttachment, setShowAttachment] = useState(false)
   const [url, setUrl] = useState("assets/MultiPage.pdf");
   const [header, setHeader] = useState();
 
@@ -67,66 +71,7 @@ export const CustomPDFViewer = () => {
     dispatch(deletedPages(selectedPages));
   };
 
-  const handleChoosePage = (e: any, props: any) => {
-    console.log(props)
-    // console.log("initial", props.renderPageThumbnail.props.pageRotation);
-    if (e.ctrlKey) {
-      if (selectedPages[props.pageIndex] === undefined) {
-        const copy = [...selectedPages];
-        copy[props.pageIndex] = props.pageIndex;
-        setSelectedPages(copy);
-        setColor("rgba(0, 0, 0, 0.3)");
-        dispatch(pageSelected(copy));
-      }
 
-      if (selectedPages[props.pageIndex] === props.pageIndex) {
-        const copy = [...selectedPages];
-        copy[props.pageIndex] = undefined;
-        setSelectedPages(copy);
-        dispatch(pageSelected(copy));
-      }
-    }
-  };
-
-  const renderThumbnailItem = (props: RenderThumbnailItemProps) => (
-    <div
-      onClick={(e) => handleChoosePage(e, props)}
-      key={props.pageIndex}
-      className="custom-thumbnail-item"
-      data-testid={`thumbnail-${props.pageIndex}`}
-      style={{
-        backgroundColor:
-          props.pageIndex === selectedPages[props.pageIndex] ? color : "#fff",
-        cursor: "pointer",
-        padding: "0.1rem",
-        width: "7rem",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-        }}
-        onClick={props.onJumpToPage}
-      >
-        {props.renderPageThumbnail}
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        {props.renderPageLabel}
-      </div>
-    </div>
-  );
-
-  const handleDocumentLoad = (e: DocumentLoadEvent) => {
-    const pages = ` ${e.doc.numPages}`;
-    setTotalPDFPages(+pages);
-    dispatch(totalPages(pages));
-  };
 
   const handleOptionChange = (event: any) => {
     setSelectedOption(event.target.value);
@@ -138,7 +83,7 @@ export const CustomPDFViewer = () => {
 
   const pageNumbers = Array.from({ length: totalPDFPages }, (index: number) => index + 1);
   const lastValue = pageNumbers.length;
-  // const lastIndex = pageNumbers.lastIndexOf(lastValue);
+  const lastIndex = pageNumbers.lastIndexOf(lastValue);
 
   useEffect(() => {
     if (pageNumbers.length > 10) {
@@ -176,8 +121,17 @@ export const CustomPDFViewer = () => {
   const [startY, setStartY] = useState<number | null>(null);
   const [endX, setEndX] = useState<number | null>(null);
   const [endY, setEndY] = useState<number | null>(null);
-  const [scale, setScale] = useState<number>(1);
+  const [scale, setScale] = useState<number>();
+  const [zoomLevel, setZoomLevel] = useState<number>(0.8)
   // const [zoomArea, setZoomArea] = useState<ZoomArea | null>(null);
+
+  const handleDocumentLoad = (e: DocumentLoadEvent) => {
+    const pages = ` ${e.doc.numPages}`;
+    setTotalPDFPages(+pages);
+    dispatch(totalPages(pages));
+    setScale(1)
+  };
+
 
   const handleMouseDown = (event: React.MouseEvent<HTMLImageElement>) => {
     if (event.button === 0 && !showMarquee) {
@@ -200,17 +154,33 @@ export const CustomPDFViewer = () => {
 
   const handleMouseUp = () => {
     if (startX !== null && startY !== null && endX !== null && endY !== null && !showMarquee) {
-      // console.log('Selected Area:', { startX, startY, endX, endY });
-    if(scale < 2){
-      console.log("h")
-      setScale(scale + 0.5)
-    }
+      console.log(startX)
+      console.log(startY)
+      console.log(endX)
+      console.log(endY)
+
+      switch (scale) {
+        case 1:
+          setStartX(null);
+          setStartY(null);
+          setEndX(null);
+          setEndY(null);
+          setScale(1.2)
+          // setZoomLevel(1.2)
+          //  zoomTo(1.2)
+          return
+        default:
+          setStartX(null);
+          setStartY(null);
+          setEndX(null);
+          setEndY(null);
+          setScale(1.1)
+        // setZoomLevel(1)
+        // zoomTo(1.1)
+      }
     }
 
-    setStartX(null);
-    setStartY(null);
-    setEndX(null);
-    setEndY(null);
+
 
   };
 
@@ -221,8 +191,14 @@ export const CustomPDFViewer = () => {
   const handleFit = (props: any) => {
     props.onZoom(SpecialZoomLevel.PageFit)
     setShowMarquee(true)
-      setScale(1)
+    setScale(1)
   }
+
+  const handleZoom = (e: ZoomEvent) => {
+    const zoomScale = e.scale;
+    console.log(`Zoom to ${zoomScale}`);
+    setScale(zoomScale - 0.1)
+  };
 
   return (
     <>
@@ -277,7 +253,9 @@ export const CustomPDFViewer = () => {
                       overlay={<Tooltip id="button-tooltip-2">Marquee Zoom</Tooltip>}
                     >
                       <div style={{ padding: "0px 20px", cursor: "pointer" }}>
+
                         <img src="icons/search.svg" onClick={handleMarquee} />
+
                       </div>
                     </OverlayTrigger> :
                     <OverlayTrigger
@@ -301,7 +279,7 @@ export const CustomPDFViewer = () => {
                   <ZoomOut />
                 </div>
                 <div style={{ padding: "0px 2px" }}>
-                  <Zoom levels={[0.8, 1.2, 1.6, 2.4, 3.2]} />
+                  <Zoom levels={[0.3, 0.5, 0.8, 1, 1.2]} />
                 </div>
                 <div style={{ padding: "0px 2px" }}>
                   <ZoomIn />
@@ -421,15 +399,17 @@ export const CustomPDFViewer = () => {
                 url={setUrl}
                 header={setHeader} />
             </Col>
-            <Col xs={4} style={{ height: "46rem", width: "10rem" }}><Thumbnails renderThumbnailItem={renderThumbnailItem} /></Col>
+            <Col xs={4} style={{ height: "46rem", width: "10rem" }}>
+              <CustomThumbnail Thumbnail={Thumbnails} />
+            </Col>
           </Row>
         </div>
         <div
           style={{
             flex: 1,
             width: "45rem",
-            overflowX: "auto",
-            overflowY: "hidden",
+            // overflowX: "auto",
+            // overflowY: "hidden",
           }}
         >
           {showAttachment &&
@@ -442,24 +422,24 @@ export const CustomPDFViewer = () => {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             style={{
-
               cursor: !showMarquee ? "zoom-in" : "default",
               transformOrigin: `${startX}px ${startY}px `,
-              transform:  `scale(${scale})`,
+              transform: `scale(${scale})`,
               userSelect: !showMarquee ? 'none' : "text",
             }}>
             <Viewer
+              onZoom={handleZoom}
               fileUrl={url}
               httpHeaders={header}
               onDocumentLoad={handleDocumentLoad}
-              plugins={[thumbnailPluginInstance, toolbarPluginInstance, attachmentPluginInstance]}
+              plugins={[thumbnailPluginInstance, toolbarPluginInstance, attachmentPluginInstance, customZoomPluginInstance]}
             />
             {!showMarquee && startX !== null && startY !== null && endX !== null && endY !== null && (
               <div
                 style={{
                   position: 'absolute',
-                  left: Math.min(startX, endX),
-                  top: Math.min(startY, endY),
+                  left: Math.min(startX),
+                  top: Math.min(startY),
                   width: Math.abs(endX - startX),
                   height: Math.abs(endY - startY),
                   border: '2px solid red',
