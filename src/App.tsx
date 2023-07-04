@@ -40,7 +40,7 @@ function App() {
           </Worker>
         </Col>
         <Col xs={5}>
-          {/* <LoadSelectedThumbnails /> */}
+          <LoadSelectedThumbnails />
         </Col>
       </Row>
     </Container>

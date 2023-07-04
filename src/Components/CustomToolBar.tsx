@@ -8,7 +8,7 @@ import { attachmentPlugin } from '@react-pdf-viewer/attachment';
 import { deletedPages } from "../Strore/SelecetedPageSclice";
 import { useDispatch } from "react-redux";
 
-
+//Needed more optimization, have to handle the logic with the viewer
 export const CustomToolBar = ({Toolbar, RotatePage, } : any) => {
 
   
