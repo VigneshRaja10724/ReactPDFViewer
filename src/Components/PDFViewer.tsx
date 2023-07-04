@@ -121,7 +121,7 @@ export const CustomPDFViewer = () => {
   const [startY, setStartY] = useState<number | null>(null);
   const [endX, setEndX] = useState<number | null>(null);
   const [endY, setEndY] = useState<number | null>(null);
-  const [scale, setScale] = useState<number>();
+  const [scale, setScale] = useState<number>(0.9);
   const [zoomLevel, setZoomLevel] = useState<number>(0.8)
   // const [zoomArea, setZoomArea] = useState<ZoomArea | null>(null);
 
@@ -129,7 +129,7 @@ export const CustomPDFViewer = () => {
     const pages = ` ${e.doc.numPages}`;
     setTotalPDFPages(+pages);
     dispatch(totalPages(pages));
-    setScale(1)
+    // setScale(1)
   };
 
 
@@ -159,24 +159,34 @@ export const CustomPDFViewer = () => {
       console.log(endX)
       console.log(endY)
 
-      switch (scale) {
+      // switch (scale) {
+      switch (zoomLevel) {
         case 1:
           setStartX(null);
           setStartY(null);
           setEndX(null);
           setEndY(null);
-          setScale(1.2)
-          // setZoomLevel(1.2)
-          //  zoomTo(1.2)
+          // setScale(1.2)
+          setZoomLevel(1.2)
+           zoomTo(1.2)
+          return
+        case 1.2:
+          setStartX(null);
+          setStartY(null);
+          setEndX(null);
+          setEndY(null);
+          // setScale(1.3)
+          setZoomLevel(1.2)
+           zoomTo(1.2)
           return
         default:
           setStartX(null);
           setStartY(null);
           setEndX(null);
           setEndY(null);
-          setScale(1.1)
-        // setZoomLevel(1)
-        // zoomTo(1.1)
+          // setScale(1)
+        setZoomLevel(1)
+        zoomTo(1.1)
       }
     }
 
@@ -194,11 +204,11 @@ export const CustomPDFViewer = () => {
     setScale(1)
   }
 
-  const handleZoom = (e: ZoomEvent) => {
-    const zoomScale = e.scale;
-    console.log(`Zoom to ${zoomScale}`);
-    setScale(zoomScale - 0.1)
-  };
+  // const handleZoom = (e: ZoomEvent) => {
+  //   const zoomScale = e.scale;
+  //   console.log(`Zoom to ${zoomScale}`);
+  //   setScale(zoomScale - 0.1)
+  // };
 
   return (
     <>
@@ -424,11 +434,11 @@ export const CustomPDFViewer = () => {
             style={{
               cursor: !showMarquee ? "zoom-in" : "default",
               transformOrigin: `${startX}px ${startY}px `,
-              transform: `scale(${scale})`,
+              // transform: `scale(${scale})`,
               userSelect: !showMarquee ? 'none' : "text",
             }}>
             <Viewer
-              onZoom={handleZoom}
+              // onZoom={handleZoom}
               fileUrl={url}
               httpHeaders={header}
               onDocumentLoad={handleDocumentLoad}
@@ -438,11 +448,14 @@ export const CustomPDFViewer = () => {
               <div
                 style={{
                   position: 'absolute',
-                  left: Math.min(startX),
-                  top: Math.min(startY),
+                  left : startX,
+                  top : startY,
+                  
+                  // left: Math.min(startX),
+                  // top: Math.min(startY),
                   width: Math.abs(endX - startX),
                   height: Math.abs(endY - startY),
-                  border: '2px solid red',
+                  border: '2px solid black',
                 }}
               />
             )

@@ -9,13 +9,10 @@ import { deletedPages } from "../Strore/SelecetedPageSclice";
 import { useDispatch } from "react-redux";
 
 
-export const CustomToolBar = () => {
+export const CustomToolBar = ({Toolbar, RotatePage, } : any) => {
 
-    const toolbarPluginInstance = toolbarPlugin();
-    const { Toolbar } = toolbarPluginInstance;
+  
 
-    const rotatePluginInstance = toolbarPluginInstance.rotatePluginInstance;
-    const { RotatePage } = rotatePluginInstance;
 
     const attachmentPluginInstance = attachmentPlugin();
     const { Attachments } = attachmentPluginInstance;
@@ -51,6 +48,7 @@ export const CustomToolBar = () => {
         // const displayedPages = pageNumbers.slice(startIndex, endIndex);
 
     }, [totalPDFPages, currentPage])
+
     const handleMarquee = () => {
         setShowMarquee(false)
     }
@@ -202,7 +200,7 @@ export const CustomToolBar = () => {
                             >
                                 <div style={{ padding: "0px 2px" }}>
                                     <RotatePage>
-                                        {(props) => (
+                                        {(props : any) => (
                                             <MinimalButton onClick={() => rotateForward(props)}>
                                                 <RotateForwardIcon />
                                             </MinimalButton>
@@ -217,7 +215,7 @@ export const CustomToolBar = () => {
                             >
                                 <div>
                                     <RotatePage>
-                                        {(props) => (
+                                        {(props : any) => (
                                             <MinimalButton onClick={() => rotateBackward(props)}>
                                                 <RotateBackwardIcon />
                                             </MinimalButton>

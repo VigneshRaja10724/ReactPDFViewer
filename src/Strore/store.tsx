@@ -1,12 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { SelectedPages } from "./SelecetedPageSclice";
 import { WebsocketSlice } from "./WebsocketSlice";
+import { ViewerProps } from "./ViewerSlice";
 
 
 export const store = configureStore({
   reducer: {
     selectPage: SelectedPages.reducer,
     websocket : WebsocketSlice.reducer,
+    showMarquee : ViewerProps.reducer,
   },
   middleware : (getDefaultMiddleware) => getDefaultMiddleware({ // to get the object no serilized from the server making it false
     serializableCheck : false
