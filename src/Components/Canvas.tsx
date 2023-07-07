@@ -6,9 +6,9 @@ const ImageEditor: React.FC = () => {
   const [endX, setEndX] = useState<number | null>(null);
   const [endY, setEndY] = useState<number | null>(null);
 
-  const [isDrawing, setIsDrawing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement[]>([]);
+  const textInputsRef = useRef<HTMLInputElement[]>([]);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.button === 0) {
@@ -16,71 +16,57 @@ const ImageEditor: React.FC = () => {
       const { left, top } = event.currentTarget.getBoundingClientRect();
       setStartX(clientX - left);
       setStartY(clientY - top);
+      setIsDragging(true);
     }
-    setIsDrawing(true);
   };
 
-  const handleMouseUp = (event: any) => {
-    console.log(startX, startY, endX, endY);
+  const handleMouseUp = () => {
     if (startX !== null && startY !== null && endX !== null && endY !== null) {
-      const { offsetX, offsetY } = event.nativeEvent;
-
       if (canvasContainerRef.current) {
-        // Create a new canvas element
         const width = endX - startX;
         const height = endY - startY;
-        const newCanvas = document.createElement('canvas');
-        newCanvas.width = width; // Customize the canvas size according to your needs
-        newCanvas.height = height;
-        newCanvas.style.position = 'absolute';
-        newCanvas.style.top = `${startX}px`;
-        newCanvas.style.left = `${startY}px`;
 
-        // Add the new canvas to the container
-        canvasContainerRef.current.appendChild(newCanvas);
+        if (width > 0 && height > 0) {
+          // Create a text input element
+          const newTextInput = document.createElement('input');
+          newTextInput.type = 'text';
+          newTextInput.style.position = 'absolute';
+          newTextInput.style.top = `${startY}px`;
+          newTextInput.style.left = `${startX}px`;
+          newTextInput.style.width = `${width}px`;
+          newTextInput.style.height = `${height}px`;
 
-        // Store the canvas reference for future use
-        canvasRef.current.push(newCanvas);
-      }
-      setStartX(null);
-      setStartY(null);
-      setEndX(null);
-      setEndY(null);
-      setIsDrawing(false);
-    }
-  };
+          // Add the text input to the container
+          canvasContainerRef.current.appendChild(newTextInput);
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (startX !== null && startY !== null) {
-      const { clientX, clientY } = event;
-      const { left, top } = event.currentTarget.getBoundingClientRect();
-      const width = clientX - left - startX;
-      const height = clientY - top - startY;
-      setEndX(clientX - left);
-      setEndY(clientY - top);
-
-      if (!isDrawing) return;
-
-      if (canvasContainerRef.current && canvasRef.current.length > 0) {
-        const context = canvasRef.current[canvasRef.current.length - 1].getContext('2d');
-
-        if (context) {
-          const canvas = canvasRef.current[canvasRef.current.length - 1];
-          canvas.width = width;
-          canvas.height = height;
-          context.fillStyle = 'white';
-          context.fillRect(0, 0, width, height); // Customize the rectangle size and position according to your needs
+          // Store the text input reference
+          textInputsRef.current.push(newTextInput);
         }
       }
     }
+
+    setStartX(null);
+    setStartY(null);
+    setEndX(null);
+    setEndY(null);
+    setIsDragging(false);
   };
 
-  const removeLatestCanvas = () => {
-    if (canvasContainerRef.current && canvasRef.current.length > 0) {
-      const latestCanvas = canvasRef.current.pop();
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (startX !== null && startY !== null && isDragging) {
+      const { clientX, clientY } = event;
+      const { left, top } = event.currentTarget.getBoundingClientRect();
+      setEndX(clientX - left);
+      setEndY(clientY - top);
+    }
+  };
 
-      if (latestCanvas) {
-        canvasContainerRef.current.removeChild(latestCanvas);
+  const removeLatestTextInput = () => {
+    if (canvasContainerRef.current && textInputsRef.current.length > 0) {
+      const latestTextInput = textInputsRef.current.pop();
+
+      if (latestTextInput) {
+        canvasContainerRef.current.removeChild(latestTextInput);
       }
     }
   };
@@ -96,9 +82,9 @@ const ImageEditor: React.FC = () => {
         <div ref={canvasContainerRef} style={{ position: 'absolute', top: 0, left: 0 }} />
         <div
           style={{
-            width: '500px', // Customize the width and height according to your needs
+            width: '500px',
             height: '500px',
-            backgroundColor: 'lightgray', // Customize the background color of the drawing area
+            backgroundColor: 'lightgray',
             border: '1px solid black',
           }}
         />
@@ -115,7 +101,7 @@ const ImageEditor: React.FC = () => {
           />
         )}
       </div>
-      <button onClick={removeLatestCanvas}>Remove Latest Canvas</button>
+      <button onClick={removeLatestTextInput}>Remove Latest Textbox</button>
     </div>
   );
 };

@@ -127,7 +127,7 @@ export const CustomPDFViewer = () => {
 
   const [reduct, setReduct] = useState<boolean>(false);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement[]>([]);
+  const textInputsRef = useRef<HTMLInputElement[]>([]);
 
   const handleDocumentLoad = (e: DocumentLoadEvent) => {
     const pages = ` ${e.doc.numPages}`;
@@ -152,77 +152,69 @@ export const CustomPDFViewer = () => {
       const { left, top } = event.currentTarget.getBoundingClientRect();
       setEndX(clientX - left);
       setEndY(clientY - top);
-
-      if (reduct && startX !== null && startY !== null && canvasContainerRef.current && canvasRef.current.length > 0) {
-        const width = clientX - left - startX;
-        const height = clientY - top - startY;
-        const context = canvasRef.current[canvasRef.current.length - 1].getContext('2d');
-
-        if (context) {
-          console.log("can")
-          const canvas = canvasRef.current[canvasRef.current.length - 1];
-          canvas.width = width;
-          canvas.height = height;
-          context.fillStyle = 'red';
-          context.fillRect(0, 0, width, height); // Customize the rectangle size and position according to your needs
-        }
-      }
     }
   };
 
   const handleMouseUp = () => {
     if (startX !== null && startY !== null && endX !== null && endY !== null && !showMarquee || reduct) {
 
-      if(!showMarquee){
+      if (!showMarquee) {
         console.log("zoom")
-      // switch (scale ) {
-      switch (zoomLevel) {
-        case 1:
-          setStartX(null);
-          setStartY(null);
-          setEndX(null);
-          setEndY(null);
-          // setScale(1.2)
-          setZoomLevel(1.2)
-          zoomTo(1.2)
-          return
-        case 1.2:
-          setStartX(null);
-          setStartY(null);
-          setEndX(null);
-          setEndY(null);
-          // setScale(1.3)
-          setZoomLevel(1.2)
-          zoomTo(1.2)
-          return
-        default:
-          setStartX(null);
-          setStartY(null);
-          setEndX(null);
-          setEndY(null);
-          // setScale(1)
-          setZoomLevel(1)
-          zoomTo(1.1)
+        // switch (scale ) {
+        switch (zoomLevel) {
+          case 1:
+            setStartX(null);
+            setStartY(null);
+            setEndX(null);
+            setEndY(null);
+            // setScale(1.2)
+            setZoomLevel(1.2)
+            zoomTo(1.2)
+            return
+          case 1.2:
+            setStartX(null);
+            setStartY(null);
+            setEndX(null);
+            setEndY(null);
+            // setScale(1.3)
+            setZoomLevel(1.2)
+            zoomTo(1.2)
+            return
+          default:
+            setStartX(null);
+            setStartY(null);
+            setEndX(null);
+            setEndY(null);
+            // setScale(1)
+            setZoomLevel(1)
+            zoomTo(1.1)
+        }
       }
-    }
 
-      if (reduct && canvasContainerRef.current && startX !== null && startY !== null && endX !== null && endY !== null ) {
-        console.log("canvas")
-        // Create a new canvas element
-        const width = endX - startX;
-        const height = endY - startY;
-        const newCanvas = document.createElement('canvas');
-        newCanvas.width = width; 
-        newCanvas.height = height;
-        newCanvas.style.position = 'absolute';
-        newCanvas.style.top = `${startX}px`;
-        newCanvas.style.left = `${startY}px`;
+      if (startX !== null && startY !== null && endX !== null && endY !== null) {
+        if (canvasContainerRef.current) {
+          const width = endX - startX;
+          const height = endY - startY;
 
-        // Add the new canvas to the container
-        canvasContainerRef.current.appendChild(newCanvas);
+          if (width > 0 && height > 0) {
+            // Create a text input element
+            const newTextInput = document.createElement('input');
+            newTextInput.type = 'text';
+            newTextInput.style.position = 'absolute';
+            newTextInput.style.top = `${startY}px`;
+            newTextInput.style.left = `${startX}px`;
+            newTextInput.style.width = `${width}px`;
+            newTextInput.style.height = `${height}px`;
 
-        // Store the canvas reference for future use
-        canvasRef.current.push(newCanvas);
+            // Add the text input to the container
+            canvasContainerRef.current.appendChild(newTextInput);
+
+            // Store the text input reference
+            textInputsRef.current.push(newTextInput);
+
+           
+          }
+        }
         setStartX(null);
         setStartY(null);
         setEndX(null);
@@ -246,11 +238,11 @@ export const CustomPDFViewer = () => {
   }
 
   const removeLatestCanvas = () => {
-    if (canvasContainerRef.current && canvasRef.current.length > 0) {
-      const latestCanvas = canvasRef.current.pop();
+    if (canvasContainerRef.current && textInputsRef.current.length > 0) {
+      const latestTextInput = textInputsRef.current.pop();
 
-      if (latestCanvas) {
-        canvasContainerRef.current.removeChild(latestCanvas);
+      if (latestTextInput) {
+        canvasContainerRef.current.removeChild(latestTextInput);
       }
     }
   };
@@ -503,8 +495,8 @@ export const CustomPDFViewer = () => {
               transformOrigin: `${startX}px ${startY}px `,
               // transform: `scale(${scale})`,
               userSelect: !showMarquee || reduct ? 'none' : "text",
-               position: 'relative', 
-            // display: 'inline-block' 
+              position: 'relative',
+              // display: 'inline-block' 
             }}>
             <Viewer
               // onZoom={handleZoom}
@@ -540,7 +532,7 @@ export const CustomPDFViewer = () => {
                     top: startY,
                     width: Math.abs(endX - startX),
                     height: Math.abs(endY - startY),
-                    border: '2px solid black',
+                    border: '2px solid red',
                   }}
                 />
               )
