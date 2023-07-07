@@ -10,7 +10,7 @@ import {
 } from "@react-pdf-viewer/thumbnail";
 import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
 import { RenderZoomProps } from '@react-pdf-viewer/zoom';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { deletedPages, totalPages } from "../Strore/SelecetedPageSclice";
@@ -125,6 +125,10 @@ export const CustomPDFViewer = () => {
   const [zoomLevel, setZoomLevel] = useState<number>(0.8)
   // const [zoomArea, setZoomArea] = useState<ZoomArea | null>(null);
 
+  const [reduct, setReduct] = useState<boolean>(false);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement[]>([]);
+
   const handleDocumentLoad = (e: DocumentLoadEvent) => {
     const pages = ` ${e.doc.numPages}`;
     setTotalPDFPages(+pages);
@@ -134,7 +138,7 @@ export const CustomPDFViewer = () => {
 
 
   const handleMouseDown = (event: React.MouseEvent<HTMLImageElement>) => {
-    if (event.button === 0 && !showMarquee) {
+    if (event.button === 0 && !showMarquee || reduct) {
       const { clientX, clientY } = event;
       const { left, top } = event.currentTarget.getBoundingClientRect();
       setStartX(clientX - left);
@@ -143,23 +147,35 @@ export const CustomPDFViewer = () => {
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLImageElement>) => {
-    if (startX !== null && startY !== null && !showMarquee) {
+    if (startX !== null && startY !== null && !showMarquee || reduct) {
       const { clientX, clientY } = event;
       const { left, top } = event.currentTarget.getBoundingClientRect();
-
       setEndX(clientX - left);
       setEndY(clientY - top);
+
+      if (reduct && startX !== null && startY !== null && canvasContainerRef.current && canvasRef.current.length > 0) {
+        const width = clientX - left - startX;
+        const height = clientY - top - startY;
+        const context = canvasRef.current[canvasRef.current.length - 1].getContext('2d');
+
+        if (context) {
+          console.log("can")
+          const canvas = canvasRef.current[canvasRef.current.length - 1];
+          canvas.width = width;
+          canvas.height = height;
+          context.fillStyle = 'red';
+          context.fillRect(0, 0, width, height); // Customize the rectangle size and position according to your needs
+        }
+      }
     }
   };
 
   const handleMouseUp = () => {
-    if (startX !== null && startY !== null && endX !== null && endY !== null && !showMarquee) {
-      console.log(startX)
-      console.log(startY)
-      console.log(endX)
-      console.log(endY)
+    if (startX !== null && startY !== null && endX !== null && endY !== null && !showMarquee || reduct) {
 
-      // switch (scale) {
+      if(!showMarquee){
+        console.log("zoom")
+      // switch (scale ) {
       switch (zoomLevel) {
         case 1:
           setStartX(null);
@@ -168,7 +184,7 @@ export const CustomPDFViewer = () => {
           setEndY(null);
           // setScale(1.2)
           setZoomLevel(1.2)
-           zoomTo(1.2)
+          zoomTo(1.2)
           return
         case 1.2:
           setStartX(null);
@@ -177,7 +193,7 @@ export const CustomPDFViewer = () => {
           setEndY(null);
           // setScale(1.3)
           setZoomLevel(1.2)
-           zoomTo(1.2)
+          zoomTo(1.2)
           return
         default:
           setStartX(null);
@@ -185,13 +201,34 @@ export const CustomPDFViewer = () => {
           setEndX(null);
           setEndY(null);
           // setScale(1)
-        setZoomLevel(1)
-        zoomTo(1.1)
+          setZoomLevel(1)
+          zoomTo(1.1)
       }
     }
 
+      if (reduct && canvasContainerRef.current && startX !== null && startY !== null && endX !== null && endY !== null ) {
+        console.log("canvas")
+        // Create a new canvas element
+        const width = endX - startX;
+        const height = endY - startY;
+        const newCanvas = document.createElement('canvas');
+        newCanvas.width = width; 
+        newCanvas.height = height;
+        newCanvas.style.position = 'absolute';
+        newCanvas.style.top = `${startX}px`;
+        newCanvas.style.left = `${startY}px`;
 
+        // Add the new canvas to the container
+        canvasContainerRef.current.appendChild(newCanvas);
 
+        // Store the canvas reference for future use
+        canvasRef.current.push(newCanvas);
+        setStartX(null);
+        setStartY(null);
+        setEndX(null);
+        setEndY(null);
+      }
+    }
   };
 
   const handleMarquee = () => {
@@ -203,6 +240,20 @@ export const CustomPDFViewer = () => {
     setShowMarquee(true)
     setScale(1)
   }
+
+  const handleReduct = () => {
+    setReduct(!reduct);
+  }
+
+  const removeLatestCanvas = () => {
+    if (canvasContainerRef.current && canvasRef.current.length > 0) {
+      const latestCanvas = canvasRef.current.pop();
+
+      if (latestCanvas) {
+        canvasContainerRef.current.removeChild(latestCanvas);
+      }
+    }
+  };
 
   // const handleZoom = (e: ZoomEvent) => {
   //   const zoomScale = e.scale;
@@ -318,6 +369,24 @@ export const CustomPDFViewer = () => {
                 <OverlayTrigger
                   placement="bottom"
                   delay={{ show: 250, hide: 400 }}
+                  overlay={<Tooltip id="button-tooltip-2">Reduct</Tooltip>}
+                >
+                  <div style={{ padding: "0px 20px", cursor: "pointer" }}>
+                    <img src="icons/eraser-fill.svg" onClick={handleReduct} />
+                  </div>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={<Tooltip id="button-tooltip-2">Undo</Tooltip>}
+                >
+                  <div style={{ padding: "0px 20px", cursor: "pointer" }}>
+                    <img src="icons/reply-fill.svg" onClick={removeLatestCanvas} />
+                  </div>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
                   overlay={<Tooltip id="button-tooltip-2">Forward</Tooltip>}
                 >
                   <div style={{ padding: "0px 2px" }}>
@@ -418,8 +487,6 @@ export const CustomPDFViewer = () => {
           style={{
             flex: 1,
             width: "45rem",
-            // overflowX: "auto",
-            // overflowY: "hidden",
           }}
         >
           {showAttachment &&
@@ -435,7 +502,9 @@ export const CustomPDFViewer = () => {
               cursor: !showMarquee ? "zoom-in" : "default",
               transformOrigin: `${startX}px ${startY}px `,
               // transform: `scale(${scale})`,
-              userSelect: !showMarquee ? 'none' : "text",
+              userSelect: !showMarquee || reduct ? 'none' : "text",
+               position: 'relative', 
+            // display: 'inline-block' 
             }}>
             <Viewer
               // onZoom={handleZoom}
@@ -444,21 +513,37 @@ export const CustomPDFViewer = () => {
               onDocumentLoad={handleDocumentLoad}
               plugins={[thumbnailPluginInstance, toolbarPluginInstance, attachmentPluginInstance, customZoomPluginInstance]}
             />
-            {!showMarquee && startX !== null && startY !== null && endX !== null && endY !== null && (
-              <div
-                style={{
-                  position: 'absolute',
-                  left : startX,
-                  top : startY,
-                  
-                  // left: Math.min(startX),
-                  // top: Math.min(startY),
-                  width: Math.abs(endX - startX),
-                  height: Math.abs(endY - startY),
-                  border: '2px solid black',
-                }}
-              />
-            )
+            <div ref={canvasContainerRef} style={{ position: 'absolute', top: 0, left: 0 }} />
+            {!showMarquee && startX !== null && startY !== null && endX !== null && endY !== null
+              && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: startX,
+                    top: startY,
+
+                    // left: Math.min(startX),
+                    // top: Math.min(startY),
+                    width: Math.abs(endX - startX),
+                    height: Math.abs(endY - startY),
+                    border: '2px solid black',
+                  }}
+                />
+              )
+            }
+            {reduct && startX !== null && startY !== null && endX !== null && endY !== null
+              && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: startX,
+                    top: startY,
+                    width: Math.abs(endX - startX),
+                    height: Math.abs(endY - startY),
+                    border: '2px solid black',
+                  }}
+                />
+              )
             }
           </div>
         </div>
