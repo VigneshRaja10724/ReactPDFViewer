@@ -6,7 +6,7 @@ import useWebSocket from "react-use-websocket";
 import "./App.css";
 import { CustomPDFViewer } from "./Components/PDFViewer";
 import { setLastJSONMessage, setWebSocketConnection } from "./Strore/WebsocketSlice";
-import ImageEditor from "./Components/Canvas";
+import CanvasTextInput from "./Components/Canvas";
 
 
 function App() {
@@ -41,7 +41,7 @@ function App() {
           </Worker>
         </Col>
         <Col xs={5}  >
-          {/* <ImageEditor /> */}
+          {/* <CanvasTextInput /> */}
            {/* <LoadSelectedThumbnails /> */}
         </Col>
       </Row>
