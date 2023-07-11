@@ -17,16 +17,17 @@ import { deletedPages, totalPages } from "../Strore/SelecetedPageSclice";
 import { CustomThumbnail } from './CustomThumbnail';
 import { Sidebar } from "./Sidebar";
 import useCustomZoomPlugin from '../Plugin/ZoomPlugin';
+import { pageThumbnailPlugin } from '../Plugin/PageThumbnailPlugin';
 
 
 export const CustomPDFViewer = () => {
-
   const dispatch = useDispatch();
+
 
   const thumbnailPluginInstance = thumbnailPlugin({
     thumbnailWidth: 100,
   });
-  const { Thumbnails } = thumbnailPluginInstance;
+  const { Thumbnails, Cover } = thumbnailPluginInstance;
 
   const toolbarPluginInstance = toolbarPlugin();
   const { Toolbar } = toolbarPluginInstance;
@@ -51,6 +52,7 @@ export const CustomPDFViewer = () => {
   const [docTitle, setDocTitle] = useState();
   const [url, setUrl] = useState("assets/MultiPage.pdf");
   const [header, setHeader] = useState();
+  const [pageIndex, setPageIndex] = useState<number>(0);
 
 
   const rotateForward = (props: any) => {
@@ -83,7 +85,7 @@ export const CustomPDFViewer = () => {
 
   const pageNumbers = Array.from({ length: totalPDFPages }, (index: number) => index + 1);
   const lastValue = pageNumbers.length;
-  const lastIndex = pageNumbers.lastIndexOf(lastValue);
+  // const lastIndex = pageNumbers.lastIndexOf(lastValue);
 
   useEffect(() => {
     if (pageNumbers.length > 10) {
@@ -191,7 +193,7 @@ export const CustomPDFViewer = () => {
         }
       }
 
-      if (startX !== null && startY !== null && endX !== null && endY !== null) {
+      if ( showMarquee && startX !== null && startY !== null && endX !== null && endY !== null) {
         if (canvasContainerRef.current) {
           const width = endX - startX;
           const height = endY - startY;
@@ -212,7 +214,7 @@ export const CustomPDFViewer = () => {
             // Store the text input reference
             textInputsRef.current.push(newTextInput);
 
-           
+
           }
         }
         setStartX(null);
@@ -233,8 +235,12 @@ export const CustomPDFViewer = () => {
     setScale(1)
   }
 
+  const pageThumbnailPluginInstance = pageThumbnailPlugin({
+    PageThumbnail: <Cover getPageIndex={()=>pageIndex} />,
+  });
   const handleReduct = () => {
     setReduct(!reduct);
+
   }
 
   const removeLatestCanvas = () => {
@@ -246,6 +252,7 @@ export const CustomPDFViewer = () => {
       }
     }
   };
+  // console.log(Viewer);
 
   // const handleZoom = (e: ZoomEvent) => {
   //   const zoomScale = e.scale;
@@ -471,7 +478,7 @@ export const CustomPDFViewer = () => {
                 header={setHeader} />
             </Col>
             <Col xs={4} style={{ height: "46rem", width: "10rem" }}>
-              <CustomThumbnail Thumbnail={Thumbnails} />
+              <CustomThumbnail Thumbnail={Thumbnails} setPageIndex={setPageIndex} />
             </Col>
           </Row>
         </div>
@@ -503,10 +510,18 @@ export const CustomPDFViewer = () => {
               fileUrl={url}
               httpHeaders={header}
               onDocumentLoad={handleDocumentLoad}
-              plugins={[thumbnailPluginInstance, toolbarPluginInstance, attachmentPluginInstance, customZoomPluginInstance]}
+              plugins={
+                [
+                  thumbnailPluginInstance,
+                  toolbarPluginInstance,
+                  attachmentPluginInstance,
+                  customZoomPluginInstance,
+                  pageThumbnailPluginInstance
+                ]
+              }
             />
             <div ref={canvasContainerRef} style={{ position: 'absolute', top: 0, left: 0 }} />
-            {!showMarquee && startX !== null && startY !== null && endX !== null && endY !== null
+            {!showMarquee  && startX !== null && startY !== null && endX !== null && endY !== null
               && (
                 <div
                   style={{
@@ -523,7 +538,7 @@ export const CustomPDFViewer = () => {
                 />
               )
             }
-            {reduct && startX !== null && startY !== null && endX !== null && endY !== null
+            { reduct && startX !== null && startY !== null && endX !== null && endY !== null
               && (
                 <div
                   style={{

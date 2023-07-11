@@ -3,12 +3,13 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { pageSelected } from "../Strore/SelecetedPageSclice";
 
-export const CustomThumbnail = ({Thumbnail} : any) =>{
+export const CustomThumbnail = ({Thumbnail , setPageIndex} : any) =>{
     const dispatch = useDispatch();
     const [selectedPages, setSelectedPages] = useState<any[]>([0]);
     const [color, setColor] = useState<string>("rgba(0, 0, 0, 0.3)");
+
     const handleChoosePage = (e: any, props: any) => {
-        console.log(props)
+        setPageIndex(props.pageIndex )
         // console.log("initial", props.renderPageThumbnail.props.pageRotation);
         if (e.ctrlKey) {
           if (selectedPages[props.pageIndex] === undefined) {
@@ -35,8 +36,8 @@ export const CustomThumbnail = ({Thumbnail} : any) =>{
           className="custom-thumbnail-item"
           data-testid={`thumbnail-${props.pageIndex}`}
           style={{
-            backgroundColor:
-              props.pageIndex === selectedPages[props.pageIndex] ? color : "#fff",
+            // backgroundColor: props.pageIndex === selectedPages[props.pageIndex] ? color : "#fff",
+              backgroundColor: props.pageIndex === props.currentPage || selectedPages[props.pageIndex] ? color : '#fff',
             cursor: "pointer",
             padding: "0.1rem",
             width: "7rem",
