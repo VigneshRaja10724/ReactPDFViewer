@@ -1,23 +1,18 @@
-import '@react-pdf-viewer/core/lib/styles/index.css';
 import { attachmentPlugin } from '@react-pdf-viewer/attachment';
-import { DocumentLoadEvent, MinimalButton, RotateDirection, SpecialZoomLevel, Viewer, ZoomEvent } from "@react-pdf-viewer/core";
-import {
-  RotateBackwardIcon,
-  RotateForwardIcon
-} from "@react-pdf-viewer/rotate";
-import {
-  thumbnailPlugin
-} from "@react-pdf-viewer/thumbnail";
+import { DocumentLoadEvent, MinimalButton, RotateDirection, ScrollMode, SpecialZoomLevel, Viewer } from "@react-pdf-viewer/core";
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import { RotateBackwardIcon, RotateForwardIcon } from "@react-pdf-viewer/rotate";
+import { thumbnailPlugin } from "@react-pdf-viewer/thumbnail";
 import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
 import { RenderZoomProps } from '@react-pdf-viewer/zoom';
 import { useEffect, useRef, useState } from "react";
 import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { useDispatch } from "react-redux";
+import useCustomZoomPlugin from '../Plugin/ZoomPlugin';
 import { deletedPages, totalPages } from "../Strore/SelecetedPageSclice";
 import { CustomThumbnail } from './CustomThumbnail';
 import { Sidebar } from "./Sidebar";
-import useCustomZoomPlugin from '../Plugin/ZoomPlugin';
-import { pageThumbnailPlugin } from '../Plugin/PageThumbnailPlugin';
+import { RenderSwitchScrollModeProps, scrollModePlugin } from '@react-pdf-viewer/scroll-mode';
 
 
 export const CustomPDFViewer = () => {
@@ -40,6 +35,9 @@ export const CustomPDFViewer = () => {
 
   const customZoomPluginInstance = useCustomZoomPlugin();
   const { zoomTo } = customZoomPluginInstance;
+
+  const scrollModePluginInstance = scrollModePlugin();
+  const { SwitchScrollMode } = scrollModePluginInstance;
 
   const [totalPDFPages, setTotalPDFPages] = useState<any>(0);
   const [currentPage, setCurrenrPage] = useState<number>(1);
@@ -130,6 +128,8 @@ export const CustomPDFViewer = () => {
   const [reduct, setReduct] = useState<boolean>(false);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const textInputsRef = useRef<HTMLInputElement[]>([]);
+  const [inputValues, setInputValues] = useState<any>([]);
+  const [inputValue, setInputValue] = useState<any>();
 
   const handleDocumentLoad = (e: DocumentLoadEvent) => {
     const pages = ` ${e.doc.numPages}`;
@@ -161,7 +161,6 @@ export const CustomPDFViewer = () => {
     if (startX !== null && startY !== null && endX !== null && endY !== null && !showMarquee || reduct) {
 
       if (!showMarquee) {
-        console.log("zoom")
         // switch (scale ) {
         switch (zoomLevel) {
           case 1:
@@ -193,12 +192,15 @@ export const CustomPDFViewer = () => {
         }
       }
 
-      if ( showMarquee && startX !== null && startY !== null && endX !== null && endY !== null) {
+      if (showMarquee && startX !== null && startY !== null && endX !== null && endY !== null) {
         if (canvasContainerRef.current) {
           const width = endX - startX;
           const height = endY - startY;
 
           if (width > 0 && height > 0) {
+
+            const inputId = `${startX},${startY}`;
+
             // Create a text input element
             const newTextInput = document.createElement('input');
             newTextInput.type = 'text';
@@ -208,13 +210,30 @@ export const CustomPDFViewer = () => {
             newTextInput.style.width = `${width}px`;
             newTextInput.style.height = `${height}px`;
 
-            // Add the text input to the container
+            // if (inputValues[inputId]) {
+            //   newTextInput.value = inputValues[inputId];
+            // }
+
+            newTextInput.addEventListener('input', (event) => {
+              const target = event.target as HTMLInputElement;
+              const { value } = target;
+              const inputValue = {
+                X: startX,
+                Y: startY,
+                value: value
+              }
+
+              setInputValue((prevInputValues: any) => ({
+                ...prevInputValues,
+                X: startX,
+                Y: startY,
+                value: value,
+              }));
+            });
+
             canvasContainerRef.current.appendChild(newTextInput);
 
-            // Store the text input reference
             textInputsRef.current.push(newTextInput);
-
-
           }
         }
         setStartX(null);
@@ -224,6 +243,41 @@ export const CustomPDFViewer = () => {
       }
     }
   };
+
+
+  useEffect(() => {
+    console.log(inputValue)
+    const updatedInputs = [...inputValues]
+
+    if (inputValues.length >= 1) {
+      const objectToUpdate = updatedInputs.find((obj: any) => obj.X === inputValue.X && obj.Y === inputValue.Y);
+
+      if (objectToUpdate) {
+
+        const updatedObject = { ...objectToUpdate };
+        updatedObject.value = inputValue.value;
+
+        const index = updatedInputs.indexOf(objectToUpdate);
+        updatedInputs[index] = updatedObject;
+
+        setInputValues(updatedInputs);
+      } else {
+        setInputValues((previousValue: any) => [...previousValue, inputValue])
+      }
+    } else {
+      if (inputValue !== undefined) {
+        setInputValues((previousValue: any) => [...previousValue, inputValue])
+      }
+    }
+
+
+  }, [inputValue]);
+
+  useEffect(() => {
+    console.log(inputValues);
+  }, [inputValues])
+
+
 
   const handleMarquee = () => {
     setShowMarquee(false)
@@ -235,24 +289,28 @@ export const CustomPDFViewer = () => {
     setScale(1)
   }
 
-  const pageThumbnailPluginInstance = pageThumbnailPlugin({
-    PageThumbnail: <Cover getPageIndex={()=>pageIndex} />,
-  });
-  const handleReduct = () => {
+
+  const handleReduct = (props: RenderSwitchScrollModeProps) => {
+    props.onClick();
     setReduct(!reduct);
 
   }
 
-  const removeLatestCanvas = () => {
+  const removeLatestCanvas = (props: RenderSwitchScrollModeProps) => {
+
     if (canvasContainerRef.current && textInputsRef.current.length > 0) {
       const latestTextInput = textInputsRef.current.pop();
-
-      if (latestTextInput) {
+      console.log( textInputsRef.current)
+        if (latestTextInput) {
+        const newInputValues = [...inputValues.slice(0, inputValues.length - 1)];
+        setInputValues(newInputValues)
         canvasContainerRef.current.removeChild(latestTextInput);
       }
+    } else {
+      props.onClick();
+
     }
   };
-  // console.log(Viewer);
 
   // const handleZoom = (e: ZoomEvent) => {
   //   const zoomScale = e.scale;
@@ -371,16 +429,25 @@ export const CustomPDFViewer = () => {
                   overlay={<Tooltip id="button-tooltip-2">Reduct</Tooltip>}
                 >
                   <div style={{ padding: "0px 20px", cursor: "pointer" }}>
-                    <img src="icons/eraser-fill.svg" onClick={handleReduct} />
+                    <SwitchScrollMode mode={ScrollMode.Page}>
+                      {(props: RenderSwitchScrollModeProps) => (
+                        <img src="icons/eraser-fill.svg" onClick={() => handleReduct(props)} />
+                      )}
+                    </SwitchScrollMode>
                   </div>
                 </OverlayTrigger>
+
                 <OverlayTrigger
                   placement="bottom"
                   delay={{ show: 250, hide: 400 }}
                   overlay={<Tooltip id="button-tooltip-2">Undo</Tooltip>}
                 >
                   <div style={{ padding: "0px 20px", cursor: "pointer" }}>
-                    <img src="icons/reply-fill.svg" onClick={removeLatestCanvas} />
+                    < SwitchScrollMode mode={ScrollMode.Wrapped}>
+                      {(props: RenderSwitchScrollModeProps) => (
+                        <img src="icons/reply-fill.svg" onClick={() => removeLatestCanvas(props)} />
+                      )}
+                    </SwitchScrollMode>
                   </div>
                 </OverlayTrigger>
                 <OverlayTrigger
@@ -482,10 +549,11 @@ export const CustomPDFViewer = () => {
             </Col>
           </Row>
         </div>
+
         <div
           style={{
             flex: 1,
-            width: "45rem",
+            width: "40rem",
           }}
         >
           {showAttachment &&
@@ -516,12 +584,12 @@ export const CustomPDFViewer = () => {
                   toolbarPluginInstance,
                   attachmentPluginInstance,
                   customZoomPluginInstance,
-                  pageThumbnailPluginInstance
+                  scrollModePluginInstance
                 ]
               }
             />
             <div ref={canvasContainerRef} style={{ position: 'absolute', top: 0, left: 0 }} />
-            {!showMarquee  && startX !== null && startY !== null && endX !== null && endY !== null
+            {!showMarquee && startX !== null && startY !== null && endX !== null && endY !== null
               && (
                 <div
                   style={{
@@ -538,7 +606,7 @@ export const CustomPDFViewer = () => {
                 />
               )
             }
-            { reduct && startX !== null && startY !== null && endX !== null && endY !== null
+            {reduct && startX !== null && startY !== null && endX !== null && endY !== null
               && (
                 <div
                   style={{
