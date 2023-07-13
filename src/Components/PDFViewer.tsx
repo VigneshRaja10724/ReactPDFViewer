@@ -577,7 +577,7 @@ export const CustomPDFViewer = () => {
               <Attachments />
             </div>}
           <div
-            className='viewer'
+            // className='viewer'
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}

@@ -7,6 +7,7 @@ import "./App.css";
 import { CustomPDFViewer } from "./Components/PDFViewer";
 import { setLastJSONMessage, setWebSocketConnection } from "./Strore/WebsocketSlice";
 import { LoadDetails } from "./Components/LoadDetails";
+import { SampleZoom } from "./Components/Sample";
 
 
 function App() {
@@ -37,7 +38,8 @@ function App() {
       <Row xs={12}>
         <Col xs={5} >
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-            <CustomPDFViewer />
+            {/* <CustomPDFViewer /> */}
+            <SampleZoom />
           </Worker>
         </Col>
         <Col xs={5}  >
