@@ -8,7 +8,7 @@ interface socket {
   lastjson: {}
 }
 
-export const LoadSelectedThumbnails = () => {
+export const LoadDetails = () => {
 
   const [pages, setPages] = useState<any>([]);
   const [totalPages, setTotalPages] = useState<any>([]);

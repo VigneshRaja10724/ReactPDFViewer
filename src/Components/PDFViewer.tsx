@@ -313,6 +313,10 @@ export const CustomPDFViewer = () => {
     }
   };
 
+  const saveReduct = () =>{
+    console.log("save")
+  }
+
   // const handleZoom = (e: ZoomEvent) => {
   //   const zoomScale = e.scale;
   //   console.log(`Zoom to ${zoomScale}`);
@@ -449,6 +453,15 @@ export const CustomPDFViewer = () => {
                         <img src="icons/reply-fill.svg" onClick={() => removeLatestCanvas(props)} />
                       )}
                     </SwitchScrollMode>
+                  </div>
+                </OverlayTrigger>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={<Tooltip id="button-tooltip-2">save</Tooltip>}
+                >
+                  <div style={{ padding: "0px 20px", cursor: "pointer" }}>
+                    <img src="icons/save.svg" onClick={saveReduct} />
                   </div>
                 </OverlayTrigger>
                 <OverlayTrigger
