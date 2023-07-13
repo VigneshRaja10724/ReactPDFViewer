@@ -302,9 +302,11 @@ export const CustomPDFViewer = () => {
       if (latestTextInput) {
         const updateInputes = [...inputValues];
         const removeInput = updateInputes.find((input) => input.value === latestTextInput.value);
-        const removeIndex = updateInputes.indexOf(removeInput);
-        const newInputValues = updateInputes.splice(removeIndex, 1);
-        setInputValues(updateInputes)
+        if(removeInput !==  undefined){
+          const removeIndex = updateInputes.indexOf(removeInput);
+          const newInputValues = updateInputes.splice(removeIndex, 1);
+          setInputValues(updateInputes)
+        }
         canvasContainerRef.current.removeChild(latestTextInput);
       }
     } else {
