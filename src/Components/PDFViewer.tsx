@@ -246,7 +246,6 @@ export const CustomPDFViewer = () => {
 
 
   useEffect(() => {
-    console.log(inputValue)
     const updatedInputs = [...inputValues]
 
     if (inputValues.length >= 1) {
@@ -300,10 +299,12 @@ export const CustomPDFViewer = () => {
 
     if (canvasContainerRef.current && textInputsRef.current.length > 0) {
       const latestTextInput = textInputsRef.current.pop();
-      console.log( textInputsRef.current)
-        if (latestTextInput) {
-        const newInputValues = [...inputValues.slice(0, inputValues.length - 1)];
-        setInputValues(newInputValues)
+      if (latestTextInput) {
+        const updateInputes = [...inputValues];
+        const removeInput = updateInputes.find((input) => input.value === latestTextInput.value);
+        const removeIndex = updateInputes.indexOf(removeInput);
+        const newInputValues = updateInputes.splice(removeIndex, 1);
+        setInputValues(updateInputes)
         canvasContainerRef.current.removeChild(latestTextInput);
       }
     } else {
