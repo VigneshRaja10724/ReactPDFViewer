@@ -36,10 +36,9 @@ function App() {
 
     <Container fluid style={{ paddingTop: 20 }}>
       <Row xs={12}>
-        <Col xs={5} >
+        <Col xs={7} >
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-            {/* <CustomPDFViewer /> */}
-            <SampleZoom />
+            <CustomPDFViewer />
           </Worker>
         </Col>
         <Col xs={5}  >

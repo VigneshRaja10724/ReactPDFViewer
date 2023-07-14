@@ -33,9 +33,6 @@ export const CustomPDFViewer = () => {
   const attachmentPluginInstance = attachmentPlugin();
   const { Attachments } = attachmentPluginInstance;
 
-  const customZoomPluginInstance = useCustomZoomPlugin();
-  const { zoomTo } = customZoomPluginInstance;
-
   const scrollModePluginInstance = scrollModePlugin();
   const { SwitchScrollMode } = scrollModePluginInstance;
 
@@ -121,9 +118,7 @@ export const CustomPDFViewer = () => {
   const [startY, setStartY] = useState<number | null>(null);
   const [endX, setEndX] = useState<number | null>(null);
   const [endY, setEndY] = useState<number | null>(null);
-  const [scale, setScale] = useState<number>(0.9);
-  const [zoomLevel, setZoomLevel] = useState<number>(0.8)
-  // const [zoomArea, setZoomArea] = useState<ZoomArea | null>(null);
+  const [scale, setScale] = useState<number>(1);
 
   const [reduct, setReduct] = useState<boolean>(false);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -161,34 +156,29 @@ export const CustomPDFViewer = () => {
     if (startX !== null && startY !== null && endX !== null && endY !== null && !showMarquee || reduct) {
 
       if (!showMarquee) {
-        // switch (scale ) {
-        switch (zoomLevel) {
+
+        switch (scale) {
           case 1:
             setStartX(null);
             setStartY(null);
             setEndX(null);
             setEndY(null);
-            // setScale(1.2)
-            setZoomLevel(1.2)
-            zoomTo(1.2)
-            return
-          case 1.2:
+            setScale(2);
+            return;
+          case 2:
             setStartX(null);
             setStartY(null);
             setEndX(null);
             setEndY(null);
-            // setScale(1.3)
-            setZoomLevel(1.2)
-            zoomTo(1.2)
-            return
+            setScale(3.5);
+            return;
           default:
             setStartX(null);
             setStartY(null);
             setEndX(null);
             setEndY(null);
-            // setScale(1)
-            setZoomLevel(1)
-            zoomTo(1.1)
+            setScale(1);
+            return;
         }
       }
 
@@ -278,12 +268,14 @@ export const CustomPDFViewer = () => {
 
 
 
-  const handleMarquee = () => {
+  const handleMarquee = (props: RenderSwitchScrollModeProps) => {
+    props.onClick();
     setShowMarquee(false)
   }
 
   const handleFit = (props: any) => {
-    props.onZoom(SpecialZoomLevel.PageFit)
+    // props.onZoom(SpecialZoomLevel.PageFit)
+    props.onClick();
     setShowMarquee(true)
     setScale(1)
   }
@@ -302,7 +294,7 @@ export const CustomPDFViewer = () => {
       if (latestTextInput) {
         const updateInputes = [...inputValues];
         const removeInput = updateInputes.find((input) => input.value === latestTextInput.value);
-        if(removeInput !==  undefined){
+        if (removeInput !== undefined) {
           const removeIndex = updateInputes.indexOf(removeInput);
           const newInputValues = updateInputes.splice(removeIndex, 1);
           setInputValues(updateInputes)
@@ -315,15 +307,9 @@ export const CustomPDFViewer = () => {
     }
   };
 
-  const saveReduct = () =>{
+  const saveReduct = () => {
     console.log("save")
   }
-
-  // const handleZoom = (e: ZoomEvent) => {
-  //   const zoomScale = e.scale;
-  //   console.log(`Zoom to ${zoomScale}`);
-  //   setScale(zoomScale - 0.1)
-  // };
 
   return (
     <>
@@ -348,7 +334,7 @@ export const CustomPDFViewer = () => {
                 style={{
                   alignItems: "center",
                   display: "flex",
-                  width: "100%",
+                  width: "60rem",
                 }}
               >
                 <OverlayTrigger
@@ -378,9 +364,11 @@ export const CustomPDFViewer = () => {
                       overlay={<Tooltip id="button-tooltip-2">Marquee Zoom</Tooltip>}
                     >
                       <div style={{ padding: "0px 20px", cursor: "pointer" }}>
-
-                        <img src="icons/search.svg" onClick={handleMarquee} />
-
+                        <SwitchScrollMode mode={ScrollMode.Page}>
+                          {(props: RenderSwitchScrollModeProps) => (
+                            <img src="icons/search.svg" onClick={() => handleMarquee(props)} />
+                          )}
+                        </SwitchScrollMode>
                       </div>
                     </OverlayTrigger> :
                     <OverlayTrigger
@@ -388,7 +376,7 @@ export const CustomPDFViewer = () => {
                       delay={{ show: 250, hide: 400 }}
                       overlay={<Tooltip id="button-tooltip-2">Fit width</Tooltip>}
                     >
-                      <div style={{ padding: "0px 20px", cursor: "pointer" }}>
+                      {/* <div style={{ padding: "0px 20px", cursor: "pointer" }}>
                         <Zoom>
                           {
                             (props: RenderZoomProps) => (
@@ -396,6 +384,13 @@ export const CustomPDFViewer = () => {
                             )
                           }
                         </Zoom>
+                      </div> */}
+                      <div style={{ padding: "0px 20px", cursor: "pointer" }}>
+                        < SwitchScrollMode mode={ScrollMode.Wrapped}>
+                          {(props: RenderSwitchScrollModeProps) => (
+                            <img src="icons/search-heart.svg" onClick={() => handleFit(props)} />
+                          )}
+                        </SwitchScrollMode>
                       </div>
                     </OverlayTrigger>
                 }
@@ -524,13 +519,15 @@ export const CustomPDFViewer = () => {
         style={{
           border: "1px solid rgba(0, 0, 0, 0.1)",
           display: "flex",
-          height: "50rem",
+          height: "60rem",
+          width: "59rem"
         }}
       >
         {/* Custom Thumbnail */}
         <div
           style={{
             borderRight: "1px solid rgba(0, 0, 0, 0.1)",
+
           }}
         >
           <div>
@@ -553,23 +550,27 @@ export const CustomPDFViewer = () => {
           </div>
           <div style={{ border: "1px solid rgba(0, 0, 0, 0.1)", textAlign: "center", width: "12rem" }}>{docTitle}</div>
           <Row xs={7}>
-            <Col xs={3} style={{ borderRight: "1px solid rgba(0, 0, 0, 0.2)", height: "46.7rem", width: "3rem" }}>
+            <Col xs={3} style={{ borderRight: "1px solid rgba(0, 0, 0, 0.2)", height: "56.5rem", width: "3rem" }}>
               <Sidebar
                 selectedOption={selectedOption}
                 docName={handelDocTitle}
                 url={setUrl}
                 header={setHeader} />
             </Col>
-            <Col xs={4} style={{ height: "46rem", width: "10rem" }}>
+            <Col xs={4} style={{ height: "56.5rem", width: "10rem" }}>
               <CustomThumbnail Thumbnail={Thumbnails} setPageIndex={setPageIndex} />
             </Col>
           </Row>
         </div>
 
         <div
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
           style={{
             flex: 1,
-            width: "40rem",
+            overflow: "auto", // Prevents content overflow
+            position: "relative" // Ensure the wrapper is positioned relative to the container
           }}
         >
           {showAttachment &&
@@ -577,20 +578,18 @@ export const CustomPDFViewer = () => {
               <Attachments />
             </div>}
           <div
-            // className='viewer'
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
+
             style={{
               cursor: !showMarquee ? "zoom-in" : "default",
               transformOrigin: `${startX}px ${startY}px `,
-              // transform: `scale(${scale})`,
+              transform: `scale(${scale})`,
               userSelect: !showMarquee || reduct ? 'none' : "text",
               position: 'relative',
-              // display: 'inline-block' 
+              display: 'inline-block',
+              width: "45rem",
+              height: "59.5rem"
             }}>
             <Viewer
-              // onZoom={handleZoom}
               fileUrl={url}
               httpHeaders={header}
               onDocumentLoad={handleDocumentLoad}
@@ -599,7 +598,6 @@ export const CustomPDFViewer = () => {
                   thumbnailPluginInstance,
                   toolbarPluginInstance,
                   attachmentPluginInstance,
-                  customZoomPluginInstance,
                   scrollModePluginInstance
                 ]
               }

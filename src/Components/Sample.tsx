@@ -34,14 +34,14 @@ export const SampleZoom = () => {
           setStartY(null);
           setEndX(null);
           setEndY(null);
-          setScale(1.7);
+          setScale(2);
           return;
-        case 1.7:
+        case 2:
           setStartX(null);
           setStartY(null);
           setEndX(null);
           setEndY(null);
-          setScale(3);
+          setScale(3.5);
           return;
         default:
           setStartX(null);
