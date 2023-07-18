@@ -1,10 +1,11 @@
 import { attachmentPlugin } from '@react-pdf-viewer/attachment';
-import { DocumentLoadEvent, MinimalButton, RotateDirection, ScrollMode, SpecialZoomLevel, Viewer } from "@react-pdf-viewer/core";
+import { DocumentLoadEvent, MinimalButton, RotateDirection, ScrollMode, Viewer, ZoomEvent } from "@react-pdf-viewer/core";
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import { RotateBackwardIcon, RotateForwardIcon } from "@react-pdf-viewer/rotate";
+import { RenderSwitchScrollModeProps, scrollModePlugin } from '@react-pdf-viewer/scroll-mode';
 import { thumbnailPlugin } from "@react-pdf-viewer/thumbnail";
 import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
-import { RenderZoomProps } from '@react-pdf-viewer/zoom';
+import '@react-pdf-viewer/zoom/lib/styles/index.css';
 import { useEffect, useRef, useState } from "react";
 import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { useDispatch } from "react-redux";
@@ -12,7 +13,6 @@ import useCustomZoomPlugin from '../Plugin/ZoomPlugin';
 import { deletedPages, totalPages } from "../Strore/SelecetedPageSclice";
 import { CustomThumbnail } from './CustomThumbnail';
 import { Sidebar } from "./Sidebar";
-import { RenderSwitchScrollModeProps, scrollModePlugin } from '@react-pdf-viewer/scroll-mode';
 
 
 export const CustomPDFViewer = () => {
@@ -35,6 +35,9 @@ export const CustomPDFViewer = () => {
 
   const scrollModePluginInstance = scrollModePlugin();
   const { SwitchScrollMode } = scrollModePluginInstance;
+
+  const customZoomPluginInstance = useCustomZoomPlugin();
+  const { zoomTo } = customZoomPluginInstance;
 
   const [totalPDFPages, setTotalPDFPages] = useState<any>(0);
   const [currentPage, setCurrenrPage] = useState<number>(1);
@@ -67,8 +70,6 @@ export const CustomPDFViewer = () => {
   const deletePages = () => {
     dispatch(deletedPages(selectedPages));
   };
-
-
 
   const handleOptionChange = (event: any) => {
     setSelectedOption(event.target.value);
@@ -125,6 +126,7 @@ export const CustomPDFViewer = () => {
   const textInputsRef = useRef<HTMLInputElement[]>([]);
   const [inputValues, setInputValues] = useState<any>([]);
   const [inputValue, setInputValue] = useState<any>();
+  const [zoomlevel, setZoomlevel] = useState<any>(1);
 
   const handleDocumentLoad = (e: DocumentLoadEvent) => {
     const pages = ` ${e.doc.numPages}`;
@@ -158,28 +160,34 @@ export const CustomPDFViewer = () => {
       if (!showMarquee) {
 
         switch (scale) {
+          // switch (zoomlevel) {
           case 1:
             setStartX(null);
             setStartY(null);
             setEndX(null);
             setEndY(null);
+            // setZoomlevel(2)
             setScale(2);
+            // zoomTo(1.5)
             return;
           case 2:
             setStartX(null);
             setStartY(null);
             setEndX(null);
-            setEndY(null);
-            setScale(3.5);
+            // setEndY(null);
+            // setZoomlevel(3)
+            setScale(4);
+            // zoomTo(8)
             return;
           default:
             setStartX(null);
             setStartY(null);
             setEndX(null);
             setEndY(null);
-            setScale(1);
+            setScale(4);
             return;
         }
+
       }
 
       if (showMarquee && startX !== null && startY !== null && endX !== null && endY !== null) {
@@ -271,6 +279,7 @@ export const CustomPDFViewer = () => {
   const handleMarquee = (props: RenderSwitchScrollModeProps) => {
     props.onClick();
     setShowMarquee(false)
+    setReduct(false)
   }
 
   const handleFit = (props: any) => {
@@ -278,6 +287,7 @@ export const CustomPDFViewer = () => {
     props.onClick();
     setShowMarquee(true)
     setScale(1)
+    setZoomlevel(1)
   }
 
 
@@ -310,6 +320,16 @@ export const CustomPDFViewer = () => {
   const saveReduct = () => {
     console.log("save")
   }
+
+  const handleZoom = (e: ZoomEvent) => {
+    console.log(`Zoom to ${e}`);
+    console.log(`Zoom to ${e.scale}`);
+    setScale(+`${e.scale}` )
+  };
+
+  useEffect(() => {
+    console.log(scale)
+  }, [scale])
 
   return (
     <>
@@ -376,15 +396,6 @@ export const CustomPDFViewer = () => {
                       delay={{ show: 250, hide: 400 }}
                       overlay={<Tooltip id="button-tooltip-2">Fit width</Tooltip>}
                     >
-                      {/* <div style={{ padding: "0px 20px", cursor: "pointer" }}>
-                        <Zoom>
-                          {
-                            (props: RenderZoomProps) => (
-                              <img src="icons/search-heart.svg" onClick={() => handleFit(props)} />
-                            )
-                          }
-                        </Zoom>
-                      </div> */}
                       <div style={{ padding: "0px 20px", cursor: "pointer" }}>
                         < SwitchScrollMode mode={ScrollMode.Wrapped}>
                           {(props: RenderSwitchScrollModeProps) => (
@@ -399,9 +410,10 @@ export const CustomPDFViewer = () => {
                   <ZoomOut />
                 </div>
                 <div style={{ padding: "0px 2px" }}>
-                  <Zoom levels={[0.3, 0.5, 0.8, 1, 1.2]} />
+                  <Zoom levels={[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4, 8]} />
                 </div>
                 <div style={{ padding: "0px 2px" }}>
+
                   <ZoomIn />
                 </div>
                 <div style={{ padding: "0px 2px", marginLeft: "auto" }}>
@@ -573,12 +585,7 @@ export const CustomPDFViewer = () => {
             position: "relative" // Ensure the wrapper is positioned relative to the container
           }}
         >
-          {showAttachment &&
-            <div >
-              <Attachments />
-            </div>}
           <div
-
             style={{
               cursor: !showMarquee ? "zoom-in" : "default",
               transformOrigin: `${startX}px ${startY}px `,
@@ -598,24 +605,27 @@ export const CustomPDFViewer = () => {
                   thumbnailPluginInstance,
                   toolbarPluginInstance,
                   attachmentPluginInstance,
-                  scrollModePluginInstance
+                  scrollModePluginInstance,
+                  customZoomPluginInstance,
                 ]
               }
+              onZoom={handleZoom}
             />
             <div ref={canvasContainerRef} style={{ position: 'absolute', top: 0, left: 0 }} />
-            {!showMarquee && startX !== null && startY !== null && endX !== null && endY !== null
+            {!showMarquee && scale < 3 && startX !== null && startY !== null && endX !== null && endY !== null
               && (
                 <div
                   style={{
                     position: 'absolute',
                     left: startX,
                     top: startY,
-
                     // left: Math.min(startX),
                     // top: Math.min(startY),
                     width: Math.abs(endX - startX),
                     height: Math.abs(endY - startY),
-                    border: '2px solid black',
+                    border: '2px dashed black',
+                    backgroundColor: 'rgba(128, 128, 128, 0.5)',
+
                   }}
                 />
               )
