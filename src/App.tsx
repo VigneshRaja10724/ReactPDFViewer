@@ -1,12 +1,8 @@
 import { Worker } from "@react-pdf-viewer/core";
-import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import { useDispatch } from "react-redux";
-import useWebSocket from "react-use-websocket";
 import "./App.css";
 import { CustomViewer } from "./Components/CustomViewer";
-import { LoadSelectedThumbnails } from "./Components/LoadThumbnails";
-import { setLastJSONMessage, setWebSocketConnection } from "./Strore/WebsocketSlice";
+import { DNDExample } from "./Components/SampleDnD";
 
 
 function App() {
@@ -42,6 +38,7 @@ function App() {
           </Worker>
         </Col>
         <Col xs={5}>
+          <DNDExample />
           {/* <LoadSelectedThumbnails /> */}
         </Col>
       </Row>

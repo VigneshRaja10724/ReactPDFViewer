@@ -1,12 +1,32 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
+import { totalPages } from "../Strore/SelecetedPageSclice";
 
-export const DragDropComponent = ({ props, index, setThumbnails, handleDrop }: any) => {
+export const DragDropComponent = ({ props, index, setThumbnails, handleDrop, thumbnails }: any) => {
+    // const [thumbnail, setThumbnail] = useState<any[]>([]);
+
 
     useEffect(() => {
-        setThumbnails((previousState: any) => {
-            return [...previousState, props]
-        })
+        console.log(props)
+
+        const thumbnailExist = thumbnails.find((item  : any) => item.pageIndex === props.pageIndex);
+        if (thumbnailExist) {
+            const replacedThumbnails = [...thumbnails]
+            const thumbnailIndex = replacedThumbnails.indexOf(thumbnailExist);
+            console.log(thumbnailIndex);
+            replacedThumbnails[thumbnailIndex] = props;
+            console.log(replacedThumbnails)
+            setThumbnails([...replacedThumbnails])
+        } else {
+            if (thumbnails.length <= props.numPages) {
+                setThumbnails((previousState: any) => {
+                    return [...previousState, props]
+                })
+            }
+          
+        }
+
+       
     }, [index])
 
     const [{ isDragging }, drag] = useDrag({

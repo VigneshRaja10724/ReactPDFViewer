@@ -1,44 +1,50 @@
 import { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
 import { useEffect, useState } from "react";
 import { DragDropComponent } from "./DragDropComponent";
-import { Thumbnail } from "./Thumbnail";
+import { render } from "@testing-library/react";
 
 
 export const CustomThumbnail = ({ Thumbnails, totalPages }: any) => {
-    const [thumbnails, setThumbnails] = useState<any>([]);
-    const [updatedThumbnails, setUpdatedThumbnails] = useState<any>([]);
+    const [thumbnails, setThumbnails] = useState<any[]>([]);
     const [reRender, setreRender] = useState<boolean>(false)
 
 
     const handleDrop = (dragIndex: any, dropIndex: any) => {
-        console.log(dragIndex, dropIndex)
+        const draggedItem = thumbnails[dragIndex];
         const updatedItems = [...thumbnails];
-        const [dragItem] = updatedItems.splice(dragIndex, 1);
-        console.log(dragIndex)
-        console.log(dropIndex)
-        console.log(dragItem)
-        updatedItems.splice(dropIndex, 0, dragItem);
-        console.log(updatedItems)
-        setUpdatedThumbnails(updatedItems);
+        updatedItems.splice(dragIndex, 1);
+        updatedItems.splice(dropIndex, 0, draggedItem);
+        setThumbnails([...updatedItems]);
         setreRender(true)
     };
 
     useEffect(() => {
-        console.log(thumbnails)
-    }, [thumbnails.length === totalPages])
-    useEffect(() => {
-        console.log(Thumbnails)
-        const {ThumbnailListWithStore} = Thumbnails;
-        console.log(ThumbnailListWithStore)
-    }, [])
-
-    useEffect(() => {
-        console.log(updatedThumbnails)
-    }, [updatedThumbnails])
+        console.log("thumbnals ",thumbnails)
+    }, [thumbnails])
 
     const renderThumbnailItem = (props: RenderThumbnailItemProps) => {
+        if (reRender) {
+            const thumbnail = thumbnails[props.pageIndex];
+            return (
+                <DragDropComponent
+                    key={thumbnail.key}
+                    props={thumbnail}
+                    index={thumbnail.pageIndex}
+                    setThumbnails={ setThumbnails}
+                    handleDrop={handleDrop}
+                    thumbnails={ thumbnails}
+                />
+            )
+        }
         return (
-            <DragDropComponent key={props.key} props={props} index={props.pageIndex} setThumbnails={setThumbnails} handleDrop={handleDrop} />
+            <DragDropComponent
+                key={props.key}
+                props={props}
+                index={props.pageIndex}
+                setThumbnails={setThumbnails}
+                handleDrop={handleDrop}
+                thumbnails={thumbnails}
+            />
         );
     }
 
