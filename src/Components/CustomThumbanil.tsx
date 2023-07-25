@@ -10,11 +10,12 @@ export const CustomThumbnail = ({ Thumbnails, totalPages }: any) => {
 
 
     const handleDrop = (dragIndex: any, dropIndex: any) => {
+        // console.log(dragIndex, dropIndex)
         const draggedItem = thumbnails[dragIndex];
         const updatedItems = [...thumbnails];
         updatedItems.splice(dragIndex, 1);
         updatedItems.splice(dropIndex, 0, draggedItem);
-        setThumbnails([...updatedItems]);
+        setThumbnails(updatedItems);
         setreRender(true)
     };
 
