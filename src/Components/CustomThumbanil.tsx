@@ -10,7 +10,7 @@ export const CustomThumbnail = ({ Thumbnails, totalPages }: any) => {
 
 
     const handleDrop = (dragIndex: any, dropIndex: any) => {
-        // console.log(dragIndex, dropIndex)
+        console.log(dragIndex, dropIndex)
         const draggedItem = thumbnails[dragIndex];
         const updatedItems = [...thumbnails];
         updatedItems.splice(dragIndex, 1);
@@ -19,10 +19,6 @@ export const CustomThumbnail = ({ Thumbnails, totalPages }: any) => {
         setreRender(true)
     };
 
-    useEffect(() => {
-        console.log("thumbnals ",thumbnails)
-    }, [thumbnails])
-
     const renderThumbnailItem = (props: RenderThumbnailItemProps) => {
         if (reRender) {
             const thumbnail = thumbnails[props.pageIndex];
@@ -30,7 +26,7 @@ export const CustomThumbnail = ({ Thumbnails, totalPages }: any) => {
                 <DragDropComponent
                     key={thumbnail.key}
                     props={thumbnail}
-                    index={thumbnail.pageIndex}
+                    index={props.pageIndex}
                     setThumbnails={ setThumbnails}
                     handleDrop={handleDrop}
                     thumbnails={ thumbnails}

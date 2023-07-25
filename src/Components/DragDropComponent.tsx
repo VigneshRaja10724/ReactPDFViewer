@@ -6,10 +6,7 @@ export const DragDropComponent = ({ props, index, setThumbnails, handleDrop, thu
 
 
     useEffect(() => {
-        console.log(props)
-
         const thumbnailExist = thumbnails.find((item  : any) => item.pageIndex === props.pageIndex);
-        console.log(thumbnailExist)
         if (thumbnailExist) {
             const replacedThumbnails = [...thumbnails]
             const thumbnailIndex = replacedThumbnails.indexOf(thumbnailExist);
