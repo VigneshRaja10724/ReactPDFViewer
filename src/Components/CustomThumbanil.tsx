@@ -1,11 +1,11 @@
 import { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DragDropComponent } from "./DragDropComponent";
-import { render } from "@testing-library/react";
 
 
-export const CustomThumbnail = ({ Thumbnails, totalPages }: any) => {
-    const [thumbnails, setThumbnails] = useState<any[]>([]);
+export const CustomThumbnail = ({ Thumbnails, setDropIndex }: any) => {
+
+  const [thumbnails, setThumbnails] = useState<any[]>([]);
     const [reRender, setreRender] = useState<boolean>(false)
 
 
@@ -17,12 +17,18 @@ export const CustomThumbnail = ({ Thumbnails, totalPages }: any) => {
         updatedItems.splice(dropIndex, 0, draggedItem);
         setThumbnails(updatedItems);
         setreRender(true)
+        setDropIndex(dropIndex)
     };
+
+    const renderSpinner = (props : any) => {
+        console.log(props)
+    }
 
     const renderThumbnailItem = (props: RenderThumbnailItemProps) => {
         if (reRender) {
             const thumbnail = thumbnails[props.pageIndex];
             return (
+            
                 <DragDropComponent
                     key={thumbnail.key}
                     props={thumbnail}
@@ -47,7 +53,7 @@ export const CustomThumbnail = ({ Thumbnails, totalPages }: any) => {
 
     return (
         <>
-            <Thumbnails renderThumbnailItem={renderThumbnailItem} /> :
+            <Thumbnails renderSpinner={renderSpinner} renderThumbnailItem={renderThumbnailItem} /> :
 
         </>
     );

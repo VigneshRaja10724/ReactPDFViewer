@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDrag, useDrop } from "react-dnd";
 
 export const DragDropComponent = ({ props, index, setThumbnails, handleDrop, thumbnails }: any) => {
-    // const [thumbnail, setThumbnail] = useState<any[]>([]);
-
 
     useEffect(() => {
         const thumbnailExist = thumbnails.find((item  : any) => item.pageIndex === props.pageIndex);
@@ -17,11 +15,8 @@ export const DragDropComponent = ({ props, index, setThumbnails, handleDrop, thu
                 setThumbnails((previousState: any) => {
                     return [...previousState, props]
                 })
-            }
-          
+            } 
         }
-
-       
     }, [index])
 
     const [{ isDragging }, drag] = useDrag({
