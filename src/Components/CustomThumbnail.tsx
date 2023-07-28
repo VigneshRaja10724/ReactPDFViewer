@@ -2,69 +2,55 @@ import { RenderThumbnailItemProps } from "@react-pdf-viewer/thumbnail";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { pageSelected } from "../Strore/SelecetedPageSclice";
+import { DragDrop } from "./DragDrop";
 
-export const CustomThumbnail = ({Thumbnail , setPageIndex} : any) =>{
-    const dispatch = useDispatch();
-    const [selectedPages, setSelectedPages] = useState<any[]>([0]);
-    const [color, setColor] = useState<string>("rgba(0, 0, 0, 0.3)");
+export const CustomThumbnail = ({ Thumbnail, setPageIndex }: any) => {
 
-    const handleChoosePage = (e: any, props: any) => {
-        setPageIndex(props.pageIndex )
-        // console.log("initial", props.renderPageThumbnail.props.pageRotation);
-        if (e.ctrlKey) {
-          if (selectedPages[props.pageIndex] === undefined) {
-            const copy = [...selectedPages];
-            copy[props.pageIndex] = props.pageIndex;
-            setSelectedPages(copy);
-            setColor("rgba(0, 0, 0, 0.3)");
-            dispatch(pageSelected(copy));
-          }
-    
-          if (selectedPages[props.pageIndex] === props.pageIndex) {
-            const copy = [...selectedPages];
-            copy[props.pageIndex] = undefined;
-            setSelectedPages(copy);
-            dispatch(pageSelected(copy));
-          }
-        }
-      };
+  const [thumbnails, setThumbnails] = useState<any[]>([]);
+  const [reRender, setreRender] = useState<boolean>(false)
 
-    const renderThumbnailItem = (props: RenderThumbnailItemProps) => (
-        <div
-          onClick={(e) => handleChoosePage(e, props)}
-          key={props.pageIndex}
-          className="custom-thumbnail-item"
-          data-testid={`thumbnail-${props.pageIndex}`}
-          style={{
-            // backgroundColor: props.pageIndex === selectedPages[props.pageIndex] ? color : "#fff",
-              backgroundColor: props.pageIndex === props.currentPage || selectedPages[props.pageIndex] ? color : '#fff',
-            cursor: "pointer",
-            padding: "0.1rem",
-            width: "7rem",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-            onClick={props.onJumpToPage}
-          >
-            {props.renderPageThumbnail}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            {props.renderPageLabel}
-          </div>
-        </div>
-      );
-    return(
-        <>
-        <Thumbnail renderThumbnailItem={renderThumbnailItem} />
-        </>
+
+  const handleDrop = (dragIndex: any, dropIndex: any) => {
+    console.log(dragIndex, dropIndex)
+    const draggedItem = thumbnails[dragIndex];
+    const updatedItems = [...thumbnails];
+    updatedItems.splice(dragIndex, 1);
+    updatedItems.splice(dropIndex, 0, draggedItem);
+    setThumbnails(updatedItems);
+    setreRender(true)
+  };
+
+  const renderThumbnailItem = (props: RenderThumbnailItemProps) => {
+    if (reRender) {
+      const thumbnail = thumbnails[props.pageIndex];
+      return (
+
+        <DragDrop
+          key={thumbnail.key}
+          props={thumbnail}
+          index={props.pageIndex}
+          setThumbnails={setThumbnails}
+          handleDrop={handleDrop}
+          thumbnails={thumbnails}
+          setPageIndex = {setPageIndex}
+        />
+      )
+    }
+    return (
+      <DragDrop
+        key={props.key}
+        props={props}
+        index={props.pageIndex}
+        setThumbnails={setThumbnails}
+        handleDrop={handleDrop}
+        thumbnails={thumbnails}
+        setPageIndex ={setPageIndex}
+      />
     );
+  }
+  return (
+    <>
+      <Thumbnail renderThumbnailItem={renderThumbnailItem} />
+    </>
+  );
 } 

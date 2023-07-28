@@ -42,7 +42,7 @@ function App() {
           </Worker>
         </Col>
         <Col xs={5}  >
-           {/* <LoadDetails /> */}
+           <LoadDetails />
         </Col>
       </Row>
     </Container>

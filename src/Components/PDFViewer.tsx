@@ -13,6 +13,8 @@ import useCustomZoomPlugin from '../Plugin/ZoomPlugin';
 import { deletedPages, totalPages } from "../Strore/SelecetedPageSclice";
 import { CustomThumbnail } from './CustomThumbnail';
 import { Sidebar } from "./Sidebar";
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 
 export const CustomPDFViewer = () => {
@@ -570,7 +572,9 @@ export const CustomPDFViewer = () => {
                 header={setHeader} />
             </Col>
             <Col xs={4} style={{ height: "56.5rem", width: "10rem" }}>
+            <DndProvider backend={HTML5Backend}>
               <CustomThumbnail Thumbnail={Thumbnails} setPageIndex={setPageIndex} />
+            </DndProvider>
             </Col>
           </Row>
         </div>
