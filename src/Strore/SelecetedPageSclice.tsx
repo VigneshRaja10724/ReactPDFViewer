@@ -9,7 +9,7 @@ export interface pdf{
 const initialState : pdf ={
     NumberOfPages : 0,
     angle : 0,
-    pagesSelected : [],
+    pagesSelected : [0],
     deletedPages : []
 }
 

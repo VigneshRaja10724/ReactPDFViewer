@@ -22,7 +22,7 @@ export const DragDrop = ({ props, index, setThumbnails, handleDrop, thumbnails, 
     }, [index])
 
     const dispatch = useDispatch();
-    const [selectedPages, setSelectedPages] = useState<any[]>([]);
+    const [selectedPages, setSelectedPages] = useState<any[]>([0]);
     const [color, setColor] = useState<string>("rgba(0, 0, 0, 0.3)");
 
     useEffect(()=>{
